@@ -1,0 +1,1946 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Calculator Admin Panel</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      :root {
+        color-scheme: light;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        padding: 2rem;
+        font-family: Arial, sans-serif;
+        background: #f1f5f9;
+        color: #0f172a;
+        min-height: 100vh;
+      }
+      body.auth-locked {
+        overflow: hidden;
+      }
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+      }
+      h1 {
+        font-size: 1.8rem;
+        margin: 0;
+      }
+      .status {
+        font-size: 0.9rem;
+        color: #475569;
+      }
+      main {
+        display: grid;
+        gap: 1.5rem;
+        padding-bottom: 4rem;
+      }
+      .hidden {
+        display: none !important;
+      }
+      .card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.75rem;
+        box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
+      }
+      .card h2 {
+        margin-top: 0;
+        font-size: 1.2rem;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      th,
+      td {
+        border-bottom: 1px solid #e2e8f0;
+        padding: 0.5rem 0.6rem;
+        text-align: left;
+      }
+      th {
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        color: #475569;
+      }
+      tr:last-child td {
+        border-bottom: none;
+      }
+      input[type="text"],
+      input[type="number"],
+      select {
+        width: 100%;
+        padding: 0.45rem 0.5rem;
+        border: 1px solid #cbd5f5;
+        border-radius: 6px;
+        font-size: 0.95rem;
+        background: #f8fafc;
+      }
+      input[type="checkbox"] {
+        width: 16px;
+        height: 16px;
+      }
+      .color-field {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+      }
+      .color-field input[type="color"] {
+        width: 44px;
+        height: 36px;
+        padding: 0;
+        border: 1px solid #cbd5f5;
+        border-radius: 6px;
+        background: #fff;
+      }
+      .color-field input[type="text"] {
+        flex: 1;
+      }
+      button {
+        padding: 0.45rem 0.9rem;
+        border-radius: 6px;
+        border: none;
+        font-size: 0.9rem;
+        cursor: pointer;
+      }
+      button.primary {
+        background: #2563eb;
+        color: #fff;
+      }
+      button.secondary {
+        background: #e2e8f0;
+        color: #1f2937;
+      }
+      button.danger {
+        background: #dc2626;
+        color: #fff;
+      }
+      button:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+      }
+      .actions {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+      }
+      .image-preview {
+        width: 72px;
+        height: 120px;
+        object-fit: contain;
+        border: 1px dashed #cbd5f5;
+        border-radius: 6px;
+        background: #f8fafc;
+        padding: 4px;
+      }
+      .status-banner {
+        margin-bottom: 1rem;
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        display: none;
+      }
+      .status-banner.show {
+        display: block;
+      }
+      .status-banner.success {
+        background: #dcfce7;
+        color: #166534;
+        border: 1px solid #86efac;
+      }
+      .status-banner.error {
+        background: #fee2e2;
+        color: #991b1b;
+        border: 1px solid #fca5a5;
+      }
+      .grid-two {
+        display: grid;
+        gap: 1rem;
+      }
+      @media (min-width: 992px) {
+        .grid-two {
+          grid-template-columns: 2fr 1fr;
+        }
+      }
+      .dataset-summary {
+        font-size: 0.95rem;
+        color: #475569;
+      }
+      .dataset-summary strong {
+        color: #1f2937;
+      }
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+        font-size: 0.75rem;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        padding: 0.2rem 0.5rem;
+        border-radius: 999px;
+        background: #dbeafe;
+        color: #1d4ed8;
+      }
+      .eta-badge {
+        background: #dcfce7;
+        color: #166534;
+      }
+      .auth-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(15, 23, 42, 0.65);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 2000;
+      }
+      .auth-card {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        width: 100%;
+        max-width: 360px;
+        box-shadow: 0 30px 60px rgba(15, 23, 42, 0.25);
+      }
+      .auth-card h2 {
+        margin: 0 0 1rem;
+        text-align: center;
+        font-size: 1.4rem;
+      }
+      .auth-card label {
+        display: block;
+        margin-bottom: 1rem;
+      }
+      .auth-card input[type="text"],
+      .auth-card input[type="password"] {
+        width: 100%;
+        padding: 0.5rem 0.6rem;
+        border: 1px solid #cbd5f5;
+        border-radius: 6px;
+        font-size: 0.95rem;
+        background: #f8fafc;
+      }
+      .auth-card button {
+        width: 100%;
+        margin-top: 0.5rem;
+      }
+      .auth-error {
+        color: #dc2626;
+        font-size: 0.85rem;
+        text-align: center;
+        min-height: 1.2rem;
+        margin-bottom: 0.25rem;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Calculator Admin</h1>
+      <div class="status">Ensure this panel sits behind Cloudflare Access</div>
+    </header>
+
+    <div id="authOverlay" class="auth-overlay">
+      <form id="loginForm" class="auth-card" autocomplete="off">
+        <h2>Admin Login</h2>
+        <div id="loginError" class="auth-error"></div>
+        <label>
+          <span>Username</span>
+          <input type="text" name="username" required data-locked="true" />
+        </label>
+        <label>
+          <span>Password</span>
+          <input type="password" name="password" required data-locked="true" />
+        </label>
+        <button class="primary" type="submit" data-locked="true">Sign In</button>
+      </form>
+    </div>
+
+    <main>
+      <section class="card">
+        <div id="statusBanner" class="status-banner"></div>
+        <div class="grid-two">
+          <div>
+            <h2>Product Catalogue</h2>
+            <p class="dataset-summary">
+              Manage the list of injectable products. Changes replicate instantly
+              to the public calculator once deployed.
+            </p>
+          </div>
+          <div>
+            <button id="refreshBtn" class="secondary" type="button">
+              Refresh Data
+            </button>
+          </div>
+        </div>
+        <div id="productTableWrapper"></div>
+        <hr />
+        <h3>Add New Product</h3>
+        <form id="createProductForm" autocomplete="off">
+          <div style="display:grid;gap:0.75rem;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));align-items:end;">
+            <label>
+              <span>Product Code</span>
+              <input type="text" name="code" required placeholder="e.g. F500" />
+            </label>
+            <label>
+              <span>Display Name</span>
+              <input type="text" name="displayName" required placeholder="Visible label" />
+            </label>
+            <label>
+              <span>Group</span>
+              <select name="group" required>
+                <option value="A">Group A</option>
+                <option value="B">Group B</option>
+              </select>
+            </label>
+            <label style="display:flex;align-items:center;gap:0.5rem;">
+              <input type="checkbox" name="etaApproved" />
+              <span>ETA Approved</span>
+            </label>
+            <button class="primary" type="submit">Create</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="card" id="formulaCard">
+        <h2>Formula Configuration</h2>
+        <p class="dataset-summary" id="formulaSummary"></p>
+        <div id="constantsTableWrapper"></div>
+      </section>
+
+      <section class="card" id="usageFactorCard">
+        <h2>Efficiency Options</h2>
+        <p class="dataset-summary">
+          Manage the labels and default selection for Standard / Optimized. Multipliers are fixed in the calculator logic.
+        </p>
+        <div id="usageFactorTableWrapper"></div>
+      </section>
+
+      <section class="card" id="themeCard">
+        <h2>Theme</h2>
+        <p class="dataset-summary">
+          Update the front-end color palette.
+        </p>
+        <div id="themeEditor"></div>
+      </section>
+
+      <section class="card" id="anchorCard">
+        <h2>Anchor Sizes</h2>
+        <p class="dataset-summary">
+          Add or update anchor dimensions for each product group and bar type.
+        </p>
+        <div class="grid-two" style="margin-bottom:1rem;align-items:end;gap:0.75rem;">
+          <label>
+            <span>Select Group</span>
+            <select id="anchorGroupSelect"></select>
+          </label>
+          <div>
+            <span>Bar Type</span>
+            <div style="display:flex;gap:0.5rem;margin-top:0.4rem;">
+              <button type="button" class="secondary" id="anchorBarThreaded">Threaded</button>
+              <button type="button" class="secondary" id="anchorBarRebar">Rebar</button>
+            </div>
+          </div>
+        </div>
+        <div id="anchorTableWrapper"></div>
+        <hr />
+        <h3>Add / Update Anchor</h3>
+        <form id="createAnchorForm" autocomplete="off">
+          <div style="display:grid;gap:0.75rem;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));align-items:end;">
+            <label>
+              <span>Anchor ID</span>
+              <input type="text" name="id" required placeholder="e.g. M35 or Φ32" />
+            </label>
+            <label>
+              <span>Group</span>
+              <select name="group" required>
+                <option value="A">Group A</option>
+                <option value="B">Group B</option>
+              </select>
+            </label>
+            <label>
+              <span>Bar Type</span>
+              <select name="barType" required>
+                <option value="threaded">Threaded</option>
+                <option value="rebar">Rebar</option>
+              </select>
+            </label>
+            <label>
+              <span>d₀ (mm)</span>
+              <input type="number" name="d0" step="0.1" min="0" required />
+            </label>
+            <label>
+              <span>dₐ (mm)</span>
+              <input type="number" name="da" step="0.1" min="0" placeholder="e.g. 10" />
+            </label>
+            <label>
+              <span>hₑf (mm)</span>
+              <input type="number" name="hef" step="1" min="0" required />
+            </label>
+            <label>
+              <span>hmin (optional)</span>
+              <input type="number" name="hmin" step="1" min="0" placeholder="Leave empty if n/a" />
+            </label>
+            <label>
+              <span>hmax (optional)</span>
+              <input type="number" name="hmax" step="1" min="0" placeholder="Leave empty if n/a" />
+            </label>
+            <label style="display:flex;align-items:center;gap:0.5rem;">
+              <input type="checkbox" name="active" checked />
+              <span>Active</span>
+            </label>
+            <button class="primary" type="submit">Save</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="card" id="etaCard">
+        <h2>ETA Approvals</h2>
+        <p class="dataset-summary">
+          Toggle which anchor sizes carry a valid ETA approval for each product and bar type.
+        </p>
+        <div class="grid-two" style="margin-bottom:1rem;align-items:end;gap:0.75rem;">
+          <label>
+            <span>Select Product</span>
+            <select id="etaProductSelect"></select>
+          </label>
+          <div>
+            <span>Bar Type</span>
+            <div style="display:flex;gap:0.5rem;margin-top:0.4rem;">
+              <button type="button" class="secondary" id="etaBarThreaded">Threaded</button>
+              <button type="button" class="secondary" id="etaBarRebar">Rebar</button>
+            </div>
+          </div>
+        </div>
+        <div id="etaAnchorList"></div>
+      </section>
+
+      <section class="card">
+        <h2>Dataset Overview</h2>
+        <div id="datasetOverview" class="dataset-summary"></div>
+      </section>
+
+      <section class="card">
+        <h2>Cartridge Settings</h2>
+        <p class="dataset-summary">
+          Adjust net fill volumes per cartridge size. These values feed directly into
+          the consumption calculations.
+        </p>
+        <div id="cartridgeTableWrapper"></div>
+        <hr />
+        <h3>Add / Update Cartridge</h3>
+        <form id="createCartridgeForm" autocomplete="off">
+          <div style="display:grid;gap:0.75rem;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));align-items:end;">
+            <label>
+              <span>Group</span>
+              <select name="group" required>
+                <option value="A">Group A</option>
+                <option value="B">Group B</option>
+              </select>
+            </label>
+            <label>
+              <span>Nominal (ml)</span>
+              <input type="number" name="nominal" step="1" min="0" required />
+            </label>
+            <label>
+              <span>Net Volume (ml)</span>
+              <input type="number" name="net" step="0.1" min="0" required />
+            </label>
+            <button class="primary" type="submit">Save</button>
+          </div>
+        </form>
+      </section>
+
+      <section class="card" id="productImageCard">
+        <h2>Product Images</h2>
+        <p class="dataset-summary">
+          Upload or replace cartridge images used in the calculator.
+        </p>
+        <div class="grid-two" style="margin-bottom:1rem;align-items:end;gap:0.75rem;">
+          <label>
+            <span>Select Product</span>
+            <select id="imageProductSelect"></select>
+          </label>
+        </div>
+        <div id="productImageTable"></div>
+      </section>
+    </main>
+
+    <script>
+      let configState = null;
+      let isLoading = false;
+      let authCredentials = null;
+      let selectedEtaProduct = null;
+      let selectedEtaBarType = "threaded";
+      let selectedAnchorGroup = null;
+      let selectedAnchorBarType = "threaded";
+      let selectedImageProduct = null;
+
+      function showStatus(message, type = "success") {
+        const banner = document.getElementById("statusBanner");
+        banner.textContent = message;
+        banner.className = "status-banner show " + type;
+        setTimeout(() => {
+          banner.className = "status-banner";
+        }, 4000);
+      }
+
+      function showLogin(message = "") {
+        const overlay = document.getElementById("authOverlay");
+        const errorEl = document.getElementById("loginError");
+        errorEl.textContent = message;
+        overlay.classList.remove("hidden");
+        document.body.classList.add("auth-locked");
+        const userInput = overlay.querySelector('input[name="username"]');
+        if (userInput) userInput.focus();
+      }
+
+      function hideLogin() {
+        const overlay = document.getElementById("authOverlay");
+        overlay.classList.add("hidden");
+        document.body.classList.remove("auth-locked");
+        document.getElementById("loginError").textContent = "";
+      }
+
+      function getAuthHeaders() {
+        if (!authCredentials) return {};
+        const token = btoa(
+          `${authCredentials.username}:${authCredentials.password}`
+        );
+        return { Authorization: `Basic ${token}` };
+      }
+
+      function setLoadingState(loading) {
+        isLoading = loading;
+        document.querySelectorAll("button, input, select").forEach((el) => {
+          if (el.dataset.locked === "true") return;
+          el.disabled = loading;
+        });
+        const refreshBtn = document.getElementById("refreshBtn");
+        if (refreshBtn) refreshBtn.disabled = loading;
+      }
+
+      async function fetchConfig(showToast = false) {
+        setLoadingState(true);
+        try {
+          const response = await fetch("/api/admin/products", {
+            headers: { accept: "application/json", ...getAuthHeaders() },
+          });
+          if (response.status === 401) {
+            authCredentials = null;
+            configState = null;
+            showLogin("Please sign in to continue.");
+            return;
+          }
+          if (!response.ok) throw new Error("Failed to load config");
+          configState = await response.json();
+          renderProducts();
+          renderFormulaSection();
+          renderUsageFactors();
+          renderTheme();
+          ensureAnchorSelection();
+          renderAnchorControls();
+          renderAnchorTable();
+          ensureEtaSelection();
+          renderEtaControls();
+          renderEtaAnchors();
+          renderOverview();
+          renderCartridges();
+          if (showToast) showStatus("Configuration refreshed.", "success");
+        } catch (error) {
+          console.error(error);
+          showStatus("Unable to load configuration data.", "error");
+        } finally {
+          setLoadingState(false);
+        }
+      }
+
+      function renderProducts() {
+        const wrapper = document.getElementById("productTableWrapper");
+        if (!wrapper) return;
+        if (!configState) {
+          wrapper.innerHTML = "<p>Loading…</p>";
+          return;
+        }
+        const groups = Object.keys(configState.groups || {});
+        const rows = (configState.products || [])
+          .map((product) => {
+            const etaBadge = product.etaApproved
+              ? '<span class="badge eta-badge">ETA</span>'
+              : "";
+            return `
+              <tr data-code="${product.code}">
+                <td><code>${product.code}</code></td>
+                <td>
+                  <input type="text" name="displayName" value="${product.displayName.replace(/"/g, "&quot;")}" />
+                </td>
+                <td>
+                  <select name="group">
+                    ${groups
+                      .map(
+                        (group) =>
+                          `<option value="${group}" ${
+                            product.group === group ? "selected" : ""
+                          }>${group}</option>`
+                      )
+                      .join("")}
+                  </select>
+                </td>
+                <td style="text-align:center;">
+                  <input type="checkbox" name="etaApproved" ${
+                    product.etaApproved ? "checked" : ""
+                  } />
+                </td>
+                <td>
+                  <div class="actions">
+                    ${etaBadge}
+                    <button class="primary" data-action="save">Save</button>
+                    <button class="danger" data-action="delete">Delete</button>
+                  </div>
+                </td>
+              </tr>
+            `;
+          })
+          .join("");
+
+        wrapper.innerHTML = `
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Code</th>
+                  <th>Display Name</th>
+                  <th>Group</th>
+                  <th style="text-align:center;">ETA</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${rows || "<tr><td colspan='5'>No products defined.</td></tr>"}
+              </tbody>
+            </table>
+          </div>
+        `;
+
+        const tbody = wrapper.querySelector("tbody");
+        tbody.addEventListener("click", async (event) => {
+          const target = event.target.closest("button");
+          if (!target) return;
+          const row = target.closest("tr");
+          const code = row?.dataset.code;
+          if (!code) return;
+
+          if (target.dataset.action === "save") {
+            await updateProduct(row, code);
+          } else if (target.dataset.action === "delete") {
+            await deleteProduct(code);
+          }
+        });
+      }
+
+      function renderOverview() {
+        const overview = document.getElementById("datasetOverview");
+        if (!overview || !configState) return;
+        const groupEntries = Object.entries(configState.groups || {});
+        const parts = groupEntries.map(([key, data]) => {
+          const threaded = (data.anchors.threaded || []).length;
+          const rebar = (data.anchors.rebar || []).length;
+          const cartridges = (data.cartridges || []).length;
+          return `<div><strong>Group ${key}</strong>: ${threaded} threaded anchors, ${rebar} rebar anchors, ${cartridges} cartridges.</div>`;
+        });
+        overview.innerHTML = `
+          <div><strong>Total Products:</strong> ${configState.products?.length || 0}</div>
+          ${parts.join("")}
+        `;
+      }
+
+      function renderFormulaSection() {
+        const wrapper = document.getElementById("constantsTableWrapper");
+        const summaryEl = document.getElementById("formulaSummary");
+        if (!wrapper || !summaryEl) return;
+        if (!configState) {
+          wrapper.innerHTML = "<p>Loading…</p>";
+          summaryEl.textContent = "";
+          return;
+        }
+
+        const constants = configState.constants || {};
+        const keysInOrder = [
+          "circular_area_factor",
+          "ml_conversion",
+          "fill_ratio",
+        ];
+        const expressionParts = ["π", "d₀²", "hₑf"];
+        keysInOrder.forEach((key) => {
+          const constant = constants[key];
+          if (constant) {
+            const formatted = Number(constant.value).toPrecision(6).replace(/0+$/,'').replace(/\.$/, '');
+            expressionParts.push(`${key} (${formatted})`);
+          }
+        });
+        summaryEl.textContent =
+          "Effective ml (1 hole) = " + expressionParts.join(" × ");
+
+        const entries = Object.entries(constants);
+        if (entries.length === 0) {
+          wrapper.innerHTML = "<p>No constants found. Configure them via the API.</p>";
+          return;
+        }
+
+        const rows = entries
+          .map(([key, constant]) => {
+            return `
+              <tr data-key="${key}">
+                <td><code>${key}</code></td>
+                <td>${constant.description}</td>
+                <td><input type="number" step="0.000001" value="${constant.value}" /></td>
+                <td><button class="primary" data-action="save">Save</button></td>
+              </tr>
+            `;
+          })
+          .join("");
+
+        wrapper.innerHTML = `
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Key</th>
+                  <th>Description</th>
+                  <th>Value</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>${rows}</tbody>
+            </table>
+          </div>
+        `;
+
+        wrapper.querySelector("tbody").addEventListener("click", async (event) => {
+          const button = event.target.closest("button[data-action='save']");
+          if (!button) return;
+          const row = button.closest("tr");
+          const key = row?.dataset.key;
+          const input = row?.querySelector("input[type='number']");
+          if (!key || !input) return;
+          const value = Number(input.value);
+          if (Number.isNaN(value)) {
+            showStatus("Value must be numeric.", "error");
+            return;
+          }
+          await updateConstant(key, value);
+        });
+      }
+
+      function renderUsageFactors() {
+        const wrapper = document.getElementById("usageFactorTableWrapper");
+        if (!wrapper) return;
+        if (!configState) {
+          wrapper.innerHTML = "<p>Loading…</p>";
+          return;
+        }
+
+        const factors = configState.usageFactors || [];
+        const rows = factors
+          .filter((factor) => factor.code === "standard" || factor.code === "optimized")
+          .map((factor) => {
+            return `
+              <tr data-code="${factor.code}" data-sort="${factor.sortOrder}" data-percentage="${factor.percentage}">
+                <td><code>${factor.code}</code></td>
+                <td><input type="text" name="labelTr" value="${factor.labelTr.replace(/"/g, "&quot;")}" /></td>
+                <td><input type="text" name="labelEn" value="${factor.labelEn.replace(/"/g, "&quot;")}" /></td>
+                <td style="text-align:center;"><input type="radio" name="usageDefault" ${factor.isDefault ? "checked" : ""} /></td>
+                <td><button class="primary" data-action="save">Save</button></td>
+              </tr>
+            `;
+          })
+          .join("");
+
+        wrapper.innerHTML = `
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Code</th>
+                  <th>Label (TR)</th>
+                  <th>Label (EN)</th>
+                  <th style="text-align:center;">Default</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>${rows || "<tr><td colspan='5'>No efficiency options configured.</td></tr>"}</tbody>
+            </table>
+          </div>
+        `;
+
+        wrapper.querySelector("tbody").addEventListener("click", async (event) => {
+          const button = event.target.closest("button[data-action='save']");
+          if (!button) return;
+          const row = button.closest("tr");
+          if (!row) return;
+          const code = row.dataset.code;
+          const labelTr = row.querySelector('input[name="labelTr"]').value.trim();
+          const labelEn = row.querySelector('input[name="labelEn"]').value.trim();
+          const isDefault = row.querySelector('input[type="radio"]').checked;
+          const sortOrder = Number(row.dataset.sort);
+          const percentageValue = Number(row.dataset.percentage);
+
+          if (!code || !labelTr || !labelEn || Number.isNaN(percentageValue)) {
+            showStatus("All fields must be filled with valid values.", "error");
+            return;
+          }
+
+          await updateUsageFactor({
+            code,
+            labelTr,
+            labelEn,
+            percentage: percentageValue,
+            sortOrder,
+            isDefault,
+          });
+        });
+
+        wrapper.querySelectorAll('input[type="radio"]').forEach((radio) => {
+          radio.addEventListener("change", () => {
+            wrapper
+              .querySelectorAll('input[type="radio"]').forEach((other) => {
+                if (other !== radio) other.checked = false;
+              });
+            radio.checked = true;
+          });
+        });
+      }
+
+      function renderTheme() {
+        const wrapper = document.getElementById("themeEditor");
+        if (!wrapper) return;
+        if (!configState) {
+          wrapper.innerHTML = "<p>Loading…</p>";
+          return;
+        }
+
+        const theme = configState.theme || {};
+        const fields = [
+          {
+            key: "brandColor",
+            label: "Brand Color",
+            fallback: "#8CCE41",
+          },
+          {
+            key: "pageBackground",
+            label: "Page Background",
+            fallback: "#f5f9fc",
+          },
+          {
+            key: "cardBackground",
+            label: "Card Background",
+            fallback: "#ffffff",
+          },
+        ];
+
+        const fieldMarkup = fields
+          .map((field) => {
+            const value = theme[field.key] || field.fallback;
+            return `
+              <label>
+                <span>${field.label}</span>
+                <div class="color-field">
+                  <input type="color" name="${field.key}" value="${value}" />
+                  <input type="text" name="${field.key}Text" value="${value}" />
+                </div>
+              </label>
+            `;
+          })
+          .join("");
+
+        wrapper.innerHTML = `
+          <div class="grid-two">${fieldMarkup}</div>
+          <div style="margin-top:1rem;">
+            <button class="primary" id="themeSaveBtn">Save Theme</button>
+          </div>
+        `;
+
+        fields.forEach((field) => {
+          const colorInput = wrapper.querySelector(`input[name="${field.key}"]`);
+          const textInput = wrapper.querySelector(`input[name="${field.key}Text"]`);
+          if (!colorInput || !textInput) return;
+          colorInput.addEventListener("input", () => {
+            textInput.value = colorInput.value;
+          });
+          textInput.addEventListener("input", () => {
+            if (/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.test(textInput.value)) {
+              colorInput.value = textInput.value;
+            }
+          });
+        });
+
+        const saveBtn = wrapper.querySelector("#themeSaveBtn");
+        if (saveBtn) {
+          saveBtn.addEventListener("click", async () => {
+            if (isLoading) return;
+            const payload = fields.reduce((acc, field) => {
+              const input = wrapper.querySelector(`input[name="${field.key}Text"]`);
+              acc[field.key] = input?.value.trim() || field.fallback;
+              return acc;
+            }, {});
+            await updateTheme(payload);
+          });
+        }
+      }
+
+      function parseOptionalNumber(value) {
+        const raw = value == null ? "" : value.toString().trim();
+        if (raw === "") return null;
+        const parsed = Number(raw);
+        return Number.isNaN(parsed) ? NaN : parsed;
+      }
+
+      function ensureAnchorSelection() {
+        if (!configState || !configState.groups) {
+          selectedAnchorGroup = null;
+          return;
+        }
+        const groupKeys = Object.keys(configState.groups || {});
+        if (!selectedAnchorGroup || !groupKeys.includes(selectedAnchorGroup)) {
+          selectedAnchorGroup = groupKeys[0] || null;
+        }
+        if (selectedAnchorBarType !== "threaded" && selectedAnchorBarType !== "rebar") {
+          selectedAnchorBarType = "threaded";
+        }
+      }
+
+      function syncAnchorFormDefaults() {
+        const form = document.getElementById("createAnchorForm");
+        if (!form) return;
+        const groupSelect = form.querySelector('select[name="group"]');
+        const barTypeSelect = form.querySelector('select[name="barType"]');
+        if (groupSelect && selectedAnchorGroup) groupSelect.value = selectedAnchorGroup;
+        if (barTypeSelect && selectedAnchorBarType) barTypeSelect.value = selectedAnchorBarType;
+      }
+
+      function renderAnchorControls() {
+        ensureAnchorSelection();
+        const selectEl = document.getElementById("anchorGroupSelect");
+        if (!selectEl || !configState) return;
+        selectEl.innerHTML = "";
+        const groupKeys = Object.keys(configState.groups || {});
+        groupKeys.forEach((groupKey) => {
+          const option = document.createElement("option");
+          option.value = groupKey;
+          option.textContent = `Group ${groupKey}`;
+          if (groupKey === selectedAnchorGroup) option.selected = true;
+          selectEl.appendChild(option);
+        });
+        selectEl.onchange = (event) => {
+          selectedAnchorGroup = event.target.value;
+          renderAnchorTable();
+          syncAnchorFormDefaults();
+        };
+
+        const threadedBtn = document.getElementById("anchorBarThreaded");
+        const rebarBtn = document.getElementById("anchorBarRebar");
+        const updateButtons = () => {
+          if (threadedBtn) threadedBtn.classList.toggle("primary", selectedAnchorBarType === "threaded");
+          if (threadedBtn) threadedBtn.classList.toggle("secondary", selectedAnchorBarType !== "threaded");
+          if (rebarBtn) rebarBtn.classList.toggle("primary", selectedAnchorBarType === "rebar");
+          if (rebarBtn) rebarBtn.classList.toggle("secondary", selectedAnchorBarType !== "rebar");
+        };
+        if (threadedBtn && !threadedBtn.dataset.bound) {
+          threadedBtn.addEventListener("click", () => {
+            selectedAnchorBarType = "threaded";
+            updateButtons();
+            renderAnchorTable();
+            syncAnchorFormDefaults();
+          });
+          threadedBtn.dataset.bound = "true";
+        }
+        if (rebarBtn && !rebarBtn.dataset.bound) {
+          rebarBtn.addEventListener("click", () => {
+            selectedAnchorBarType = "rebar";
+            updateButtons();
+            renderAnchorTable();
+            syncAnchorFormDefaults();
+          });
+          rebarBtn.dataset.bound = "true";
+        }
+        updateButtons();
+        syncAnchorFormDefaults();
+      }
+
+      function renderAnchorTable() {
+        const wrapper = document.getElementById("anchorTableWrapper");
+        if (!wrapper) return;
+        if (!configState) {
+          wrapper.innerHTML = "<p>Loading…</p>";
+          return;
+        }
+        if (!selectedAnchorGroup) {
+          wrapper.innerHTML = "<p>Select a group.</p>";
+          return;
+        }
+        const group = configState.groups?.[selectedAnchorGroup];
+        if (!group) {
+          wrapper.innerHTML = "<p>No anchor data for this group.</p>";
+          return;
+        }
+        const anchors = group.anchors?.[selectedAnchorBarType] || [];
+        if (!anchors.length) {
+          wrapper.innerHTML = "<p>No anchors for the selected bar type.</p>";
+          return;
+        }
+
+        const rows = anchors
+          .map((anchor) => {
+            const da = anchor.da ?? "";
+            const hmin = anchor.hmin ?? "";
+            const hmax = anchor.hmax ?? "";
+            const isActive = anchor.active !== false;
+            return `
+              <tr data-anchor="${anchor.id}">
+                <td><code>${anchor.id}</code></td>
+                <td><input type="number" name="d0" step="0.1" min="0" value="${anchor.d0}" /></td>
+                <td><input type="number" name="da" step="0.1" min="0" value="${da}" placeholder="-" /></td>
+                <td><input type="number" name="hef" step="1" min="0" value="${anchor.hef}" /></td>
+                <td><input type="number" name="hmin" step="1" min="0" value="${hmin}" placeholder="-" /></td>
+                <td><input type="number" name="hmax" step="1" min="0" value="${hmax}" placeholder="-" /></td>
+                <td style="text-align:center;"><input type="checkbox" name="active" ${isActive ? "checked" : ""} /></td>
+                <td><button class="primary" data-action="save">Save</button></td>
+              </tr>
+            `;
+          })
+          .join("");
+
+        wrapper.innerHTML = `
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Anchor</th>
+                  <th>d₀</th>
+                  <th>dₐ</th>
+                  <th>hₑf</th>
+                  <th>hmin</th>
+                  <th>hmax</th>
+                  <th style="text-align:center;">Active</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${rows || "<tr><td colspan='8'>No anchor data.</td></tr>"}
+              </tbody>
+            </table>
+          </div>
+        `;
+
+        wrapper.querySelector("tbody").addEventListener("click", async (event) => {
+          const button = event.target.closest("button[data-action='save']");
+          if (!button) return;
+          const row = button.closest("tr");
+          const anchorId = row?.dataset.anchor;
+          if (!anchorId) return;
+          const d0Input = row.querySelector('input[name="d0"]');
+          const daInput = row.querySelector('input[name="da"]');
+          const hefInput = row.querySelector('input[name="hef"]');
+          const hminInput = row.querySelector('input[name="hmin"]');
+          const hmaxInput = row.querySelector('input[name="hmax"]');
+          const activeInput = row.querySelector('input[name="active"]');
+          if (!d0Input || !daInput || !hefInput || !hminInput || !hmaxInput || !activeInput) return;
+
+          const d0 = Number(d0Input.value);
+          const da = parseOptionalNumber(daInput.value);
+          const hef = Number(hefInput.value);
+          const hmin = parseOptionalNumber(hminInput.value);
+          const hmax = parseOptionalNumber(hmaxInput.value);
+          const active = activeInput.checked;
+
+          if (Number.isNaN(d0) || d0 <= 0 || Number.isNaN(hef) || hef <= 0) {
+            showStatus("d₀ and hₑf must be positive numbers.", "error");
+            return;
+          }
+          if (da != null && (Number.isNaN(da) || da <= 0)) {
+            showStatus("dₐ must be a positive number when provided.", "error");
+            return;
+          }
+          if ((hmin != null && Number.isNaN(hmin)) || (hmax != null && Number.isNaN(hmax))) {
+            showStatus("hmin and hmax must be numeric when provided.", "error");
+            return;
+          }
+          if ((hmin != null && hmin < 0) || (hmax != null && hmax < 0)) {
+            showStatus("hmin and hmax cannot be negative.", "error");
+            return;
+          }
+          if (hmin != null && hmax != null && hmin > hmax) {
+            showStatus("hmin must be less than or equal to hmax.", "error");
+            return;
+          }
+
+          await saveAnchor(
+            {
+              id: anchorId,
+              group: selectedAnchorGroup,
+              barType: selectedAnchorBarType,
+              d0,
+              da,
+              hef,
+              hmin,
+              hmax,
+              active,
+            },
+            `Anchor ${anchorId} updated.`
+          );
+        });
+      }
+
+      function ensureEtaSelection() {
+        if (!configState || !configState.products || !configState.products.length) {
+          selectedEtaProduct = null;
+          return;
+        }
+        if (!selectedEtaProduct || !configState.products.find((p) => p.code === selectedEtaProduct)) {
+          selectedEtaProduct = configState.products[0].code;
+        }
+        if (selectedEtaBarType !== "threaded" && selectedEtaBarType !== "rebar") {
+          selectedEtaBarType = "threaded";
+        }
+      }
+
+      function renderEtaControls() {
+        ensureEtaSelection();
+        const selectEl = document.getElementById("etaProductSelect");
+        if (!selectEl || !configState) return;
+        selectEl.innerHTML = "";
+        (configState.products || []).forEach((product) => {
+          const option = document.createElement("option");
+          option.value = product.code;
+          option.textContent = product.displayName;
+          if (product.code === selectedEtaProduct) option.selected = true;
+          selectEl.appendChild(option);
+        });
+        selectEl.onchange = (event) => {
+          selectedEtaProduct = event.target.value;
+          renderEtaAnchors();
+        };
+
+        const threadedBtn = document.getElementById("etaBarThreaded");
+        const rebarBtn = document.getElementById("etaBarRebar");
+        const updateButtons = () => {
+          if (threadedBtn) threadedBtn.classList.toggle("primary", selectedEtaBarType === "threaded");
+          if (threadedBtn) threadedBtn.classList.toggle("secondary", selectedEtaBarType !== "threaded");
+          if (rebarBtn) rebarBtn.classList.toggle("primary", selectedEtaBarType === "rebar");
+          if (rebarBtn) rebarBtn.classList.toggle("secondary", selectedEtaBarType !== "rebar");
+        };
+        if (threadedBtn && !threadedBtn.dataset.bound) {
+          threadedBtn.addEventListener("click", () => {
+            selectedEtaBarType = "threaded";
+            updateButtons();
+            renderEtaAnchors();
+          });
+          threadedBtn.dataset.bound = "true";
+        }
+        if (rebarBtn && !rebarBtn.dataset.bound) {
+          rebarBtn.addEventListener("click", () => {
+            selectedEtaBarType = "rebar";
+            updateButtons();
+            renderEtaAnchors();
+          });
+          rebarBtn.dataset.bound = "true";
+        }
+        updateButtons();
+      }
+
+      function renderEtaAnchors() {
+        const container = document.getElementById("etaAnchorList");
+        if (!container) return;
+        if (!configState || !selectedEtaProduct) {
+          container.innerHTML = "<p>Select a product.</p>";
+          return;
+        }
+
+        const product = configState.products.find((p) => p.code === selectedEtaProduct);
+        if (!product) {
+          container.innerHTML = "<p>Invalid product selection.</p>";
+          return;
+        }
+        const group = configState.groups?.[product.group];
+        if (!group) {
+          container.innerHTML = "<p>No anchor data for this product.</p>";
+          return;
+        }
+
+        const anchors = group.anchors?.[selectedEtaBarType] || [];
+        if (!anchors.length) {
+          container.innerHTML = "<p>No anchors for the selected bar type.</p>";
+          return;
+        }
+
+        const etaMap = (configState.etaAssignments?.[selectedEtaProduct]?.[selectedEtaBarType]) || {};
+
+        const rows = anchors
+          .map((anchor) => {
+            const checked = etaMap[anchor.id] ? "checked" : "";
+            return `
+              <tr data-anchor="${anchor.id}">
+                <td>${anchor.id}</td>
+                <td>${anchor.d0} mm</td>
+                <td>${anchor.hef} mm</td>
+                <td style="text-align:center;"><input type="checkbox" ${checked} /></td>
+                <td><button class="primary" data-action="save">Save</button></td>
+              </tr>
+            `;
+          })
+          .join("");
+
+        container.innerHTML = `
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Anchor</th>
+                  <th>d₀</th>
+                  <th>hₑf</th>
+                  <th style="text-align:center;">ETA</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>${rows}</tbody>
+            </table>
+          </div>
+        `;
+
+        container.querySelector("tbody").addEventListener("click", async (event) => {
+          const button = event.target.closest("button[data-action='save']");
+          if (!button) return;
+          const row = button.closest("tr");
+          const anchorId = row?.dataset.anchor;
+          const checkbox = row?.querySelector('input[type="checkbox"]');
+          if (!anchorId || !checkbox) return;
+          await updateEtaAssignment({
+            productCode: selectedEtaProduct,
+            barType: selectedEtaBarType,
+            anchorId,
+            enabled: checkbox.checked,
+          });
+        });
+      }
+
+      function renderCartridges() {
+        const wrapper = document.getElementById("cartridgeTableWrapper");
+        if (!wrapper) return;
+        if (!configState) {
+          wrapper.innerHTML = "<p>Loading…</p>";
+          return;
+        }
+        const rows = Object.entries(configState.groups || {})
+          .flatMap(([groupKey, groupData]) => {
+            return (groupData.cartridges || []).map((cart) => {
+              return `
+                <tr data-group="${groupKey}" data-nominal="${cart.nominal}">
+                  <td>${groupKey}</td>
+                  <td>${cart.nominal} ml</td>
+                  <td><input type="number" step="0.1" min="0" value="${cart.net}" /></td>
+                  <td>
+                    <div class="actions">
+                      <button class="primary" data-action="save">Save</button>
+                      <button class="danger" data-action="delete">Delete</button>
+                    </div>
+                  </td>
+                </tr>
+              `;
+            });
+          })
+          .join("");
+
+        wrapper.innerHTML = `
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Group</th>
+                  <th>Nominal</th>
+                  <th>Net Volume</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${rows || "<tr><td colspan='4'>No cartridge data.</td></tr>"}
+              </tbody>
+            </table>
+          </div>
+        `;
+
+        wrapper.querySelector("tbody").addEventListener("click", async (event) => {
+          const button = event.target.closest("button[data-action]");
+          if (!button) return;
+          const action = button.dataset.action;
+          const row = button.closest("tr");
+          const groupKey = row?.dataset.group;
+          const nominal = Number(row?.dataset.nominal);
+          if (!groupKey || Number.isNaN(nominal)) return;
+
+          if (action === "save") {
+            const netInput = row?.querySelector("input[type='number']");
+            if (!netInput) return;
+            const netValue = Number(netInput.value);
+            if (Number.isNaN(netValue) || netValue <= 0) {
+              showStatus("Net volume must be a positive number.", "error");
+              return;
+            }
+            await updateCartridge(groupKey, nominal, netValue);
+          } else if (action === "delete") {
+            await deleteCartridge(groupKey, nominal);
+          }
+        });
+
+        renderProductImages();
+      }
+
+      function ensureImageProductSelection() {
+        if (!configState || !configState.products || !configState.products.length) {
+          selectedImageProduct = null;
+          return;
+        }
+        if (
+          !selectedImageProduct ||
+          !configState.products.find((p) => p.code === selectedImageProduct)
+        ) {
+          selectedImageProduct = configState.products[0].code;
+        }
+      }
+
+      function getProductImageUrl(productCode, nominal, cacheBust) {
+        const query = `product=${encodeURIComponent(productCode)}&nominal=${encodeURIComponent(nominal)}`;
+        return `/api/assets/product-image?${query}${cacheBust ? `&t=${cacheBust}` : ""}`;
+      }
+
+      function renderProductImages() {
+        const wrapper = document.getElementById("productImageTable");
+        const selectEl = document.getElementById("imageProductSelect");
+        if (!wrapper || !selectEl) return;
+        if (!configState) {
+          wrapper.innerHTML = "<p>Loading…</p>";
+          return;
+        }
+
+        ensureImageProductSelection();
+        selectEl.innerHTML = "";
+        (configState.products || []).forEach((product) => {
+          const option = document.createElement("option");
+          option.value = product.code;
+          option.textContent = product.displayName;
+          if (product.code === selectedImageProduct) option.selected = true;
+          selectEl.appendChild(option);
+        });
+        selectEl.onchange = (event) => {
+          selectedImageProduct = event.target.value;
+          renderProductImages();
+        };
+
+        if (!selectedImageProduct) {
+          wrapper.innerHTML = "<p>No products available.</p>";
+          return;
+        }
+
+        const product = configState.products.find((p) => p.code === selectedImageProduct);
+        const group = product ? configState.groups?.[product.group] : null;
+        const cartridges = group?.cartridges || [];
+        if (!cartridges.length) {
+          wrapper.innerHTML = "<p>No cartridges for the selected product.</p>";
+          return;
+        }
+
+        const rows = cartridges
+          .map((cart) => {
+            const imageUrl = getProductImageUrl(selectedImageProduct, cart.nominal);
+            return `
+              <tr data-nominal="${cart.nominal}">
+                <td><img class="image-preview" src="${imageUrl}" alt="${selectedImageProduct}-${cart.nominal}" /></td>
+                <td>${cart.nominal} ml</td>
+                <td><input type="file" accept="image/*" /></td>
+                <td>
+                  <div class="actions">
+                    <button class="primary" data-action="upload">Upload</button>
+                    <button class="secondary" data-action="reset">Reset</button>
+                  </div>
+                </td>
+              </tr>
+            `;
+          })
+          .join("");
+
+        wrapper.innerHTML = `
+          <div class="table-responsive">
+            <table>
+              <thead>
+                <tr>
+                  <th>Preview</th>
+                  <th>Cartridge</th>
+                  <th>File</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                ${rows}
+              </tbody>
+            </table>
+          </div>
+        `;
+
+        wrapper.querySelector("tbody").addEventListener("click", async (event) => {
+          const button = event.target.closest("button[data-action]");
+          if (!button) return;
+          const row = button.closest("tr");
+          const nominal = Number(row?.dataset.nominal);
+          if (!selectedImageProduct || Number.isNaN(nominal)) return;
+
+          if (button.dataset.action === "upload") {
+            const fileInput = row.querySelector('input[type="file"]');
+            const file = fileInput?.files?.[0];
+            if (!file) {
+              showStatus("Select an image file first.", "error");
+              return;
+            }
+            await uploadProductImage(selectedImageProduct, nominal, file);
+          } else if (button.dataset.action === "reset") {
+            await deleteProductImage(selectedImageProduct, nominal);
+          }
+
+          const img = row.querySelector("img");
+          if (img) {
+            img.src = getProductImageUrl(selectedImageProduct, nominal, Date.now());
+          }
+        });
+      }
+
+      async function updateProduct(row, code) {
+        if (isLoading) return;
+        const displayName = row.querySelector('input[name="displayName"]').value.trim();
+        const group = row.querySelector('select[name="group"]').value;
+        const etaApproved = row.querySelector('input[name="etaApproved"]').checked;
+
+        if (!displayName) {
+          showStatus("Display name cannot be empty.", "error");
+          return;
+        }
+
+        setLoadingState(true);
+        try {
+          const response = await fetch(`/api/admin/products/${encodeURIComponent(code)}`, {
+            method: "PUT",
+            headers: { "content-type": "application/json", ...getAuthHeaders() },
+            body: JSON.stringify({ displayName, group, etaApproved }),
+          });
+          const result = await response.json();
+          if (response.status === 401) {
+            authCredentials = null;
+            showLogin("Session expired. Please sign in again.");
+            return;
+          }
+          if (!response.ok) {
+            throw new Error(result.error || "Update failed.");
+          }
+          configState = result.config;
+          renderProducts();
+          renderFormulaSection();
+          renderUsageFactors();
+          renderOverview();
+          renderCartridges();
+          showStatus(`Product ${code} updated.`, "success");
+        } catch (error) {
+          console.error(error);
+          showStatus(error.message, "error");
+        } finally {
+          setLoadingState(false);
+        }
+      }
+
+      async function deleteProduct(code) {
+        if (isLoading) return;
+        if (!confirm(`Delete product ${code}?`)) return;
+        setLoadingState(true);
+        try {
+          const response = await fetch(`/api/admin/products/${encodeURIComponent(code)}`, {
+            method: "DELETE",
+            headers: { accept: "application/json", ...getAuthHeaders() },
+          });
+          const result = await response.json();
+          if (response.status === 401) {
+            authCredentials = null;
+            showLogin("Session expired. Please sign in again.");
+            return;
+          }
+          if (!response.ok) {
+            throw new Error(result.error || "Delete failed.");
+          }
+          configState = result.config;
+          renderProducts();
+          renderFormulaSection();
+          renderUsageFactors();
+          renderOverview();
+          renderCartridges();
+          showStatus(`Product ${code} deleted.`, "success");
+        } catch (error) {
+          console.error(error);
+          showStatus(error.message, "error");
+        } finally {
+          setLoadingState(false);
+        }
+      }
+
+      document.getElementById("refreshBtn").addEventListener("click", () => {
+        fetchConfig(true);
+      });
+
+      document
+        .getElementById("createProductForm")
+        .addEventListener("submit", async (event) => {
+          event.preventDefault();
+          if (isLoading) return;
+          const form = event.target;
+          const formData = new FormData(form);
+          const payload = {
+            code: formData.get("code")?.toString().trim().toUpperCase(),
+            displayName: formData.get("displayName")?.toString().trim(),
+            group: formData.get("group")?.toString(),
+            etaApproved: formData.get("etaApproved") === "on",
+          };
+
+          if (!payload.code || !payload.displayName) {
+            showStatus("Code and Display Name are required.", "error");
+            return;
+          }
+
+          setLoadingState(true);
+          try {
+            const response = await fetch("/api/admin/products", {
+              method: "POST",
+              headers: { "content-type": "application/json", ...getAuthHeaders() },
+              body: JSON.stringify(payload),
+            });
+            const result = await response.json();
+            if (response.status === 401) {
+              authCredentials = null;
+              showLogin("Session expired. Please sign in again.");
+              return;
+            }
+            if (!response.ok) {
+              throw new Error(result.error || "Create failed.");
+            }
+            configState = result.config;
+            form.reset();
+            form.querySelector('select[name="group"]').value = "A";
+            renderProducts();
+            renderFormulaSection();
+            renderUsageFactors();
+            renderOverview();
+            renderCartridges();
+            showStatus(`Product ${payload.code} created.`, "success");
+          } catch (error) {
+            console.error(error);
+            showStatus(error.message, "error");
+          } finally {
+            setLoadingState(false);
+          }
+        });
+
+      document
+        .getElementById("createAnchorForm")
+        .addEventListener("submit", async (event) => {
+          event.preventDefault();
+          if (isLoading) return;
+          const form = event.target;
+          const formData = new FormData(form);
+          const payload = {
+            id: formData.get("id")?.toString().trim(),
+            group: formData.get("group")?.toString().trim(),
+            barType: formData.get("barType")?.toString().trim(),
+            d0: Number(formData.get("d0")),
+            da: parseOptionalNumber(formData.get("da")),
+            hef: Number(formData.get("hef")),
+            hmin: parseOptionalNumber(formData.get("hmin")),
+            hmax: parseOptionalNumber(formData.get("hmax")),
+            active: formData.get("active") === "on",
+          };
+
+          if (!payload.id || !payload.group || !payload.barType) {
+            showStatus("Anchor ID, group, and bar type are required.", "error");
+            return;
+          }
+          if (Number.isNaN(payload.d0) || payload.d0 <= 0 || Number.isNaN(payload.hef) || payload.hef <= 0) {
+            showStatus("d₀ and hₑf must be positive numbers.", "error");
+            return;
+          }
+          if (payload.da != null && (Number.isNaN(payload.da) || payload.da <= 0)) {
+            showStatus("dₐ must be a positive number when provided.", "error");
+            return;
+          }
+          if ((payload.hmin != null && Number.isNaN(payload.hmin)) || (payload.hmax != null && Number.isNaN(payload.hmax))) {
+            showStatus("hmin and hmax must be numeric when provided.", "error");
+            return;
+          }
+          if ((payload.hmin != null && payload.hmin < 0) || (payload.hmax != null && payload.hmax < 0)) {
+            showStatus("hmin and hmax cannot be negative.", "error");
+            return;
+          }
+          if (payload.hmin != null && payload.hmax != null && payload.hmin > payload.hmax) {
+            showStatus("hmin must be less than or equal to hmax.", "error");
+            return;
+          }
+
+          await saveAnchor(payload, `Anchor ${payload.id} saved.`);
+          form.reset();
+          syncAnchorFormDefaults();
+          const activeInput = form.querySelector('input[name="active"]');
+          if (activeInput) activeInput.checked = true;
+        });
+
+      document
+        .getElementById("createCartridgeForm")
+        .addEventListener("submit", async (event) => {
+          event.preventDefault();
+          if (isLoading) return;
+          const form = event.target;
+          const formData = new FormData(form);
+          const groupKey = formData.get("group")?.toString().trim();
+          const nominal = Number(formData.get("nominal"));
+          const net = Number(formData.get("net"));
+
+          if (!groupKey || Number.isNaN(nominal) || Number.isNaN(net)) {
+            showStatus("Group, nominal, and net values are required.", "error");
+            return;
+          }
+          if (nominal <= 0 || net <= 0) {
+            showStatus("Nominal and net values must be positive.", "error");
+            return;
+          }
+
+          await updateCartridge(groupKey, nominal, net);
+          form.reset();
+          form.querySelector('select[name="group"]').value = "A";
+        });
+
+      async function updateCartridge(groupKey, nominal, net) {
+        if (isLoading) return;
+        setLoadingState(true);
+        try {
+          const response = await fetch("/api/admin/cartridges", {
+            method: "PUT",
+            headers: { "content-type": "application/json", ...getAuthHeaders() },
+            body: JSON.stringify({ group: groupKey, nominal, net }),
+          });
+          const result = await response.json();
+          if (response.status === 401) {
+            authCredentials = null;
+            showLogin("Session expired. Please sign in again.");
+            return;
+          }
+          if (!response.ok) {
+            throw new Error(result.error || "Update failed.");
+          }
+          configState = result.config;
+          renderCartridges();
+          renderOverview();
+          showStatus(`Cartridge ${nominal} ml updated.`, "success");
+        } catch (error) {
+          console.error(error);
+          showStatus(error.message, "error");
+        } finally {
+          setLoadingState(false);
+        }
+      }
+
+      async function deleteCartridge(groupKey, nominal) {
+        if (isLoading) return;
+        if (!confirm(`Delete cartridge ${nominal} ml for group ${groupKey}?`)) return;
+        setLoadingState(true);
+        try {
+          const response = await fetch("/api/admin/cartridges", {
+            method: "DELETE",
+            headers: { "content-type": "application/json", ...getAuthHeaders() },
+            body: JSON.stringify({ group: groupKey, nominal }),
+          });
+          const result = await response.json();
+          if (response.status === 401) {
+            authCredentials = null;
+            showLogin("Session expired. Please sign in again.");
+            return;
+          }
+          if (!response.ok) {
+            throw new Error(result.error || "Delete failed.");
+          }
+          configState = result.config;
+          renderCartridges();
+          renderOverview();
+          showStatus(`Cartridge ${nominal} ml deleted.`, "success");
+        } catch (error) {
+          console.error(error);
+          showStatus(error.message, "error");
+        } finally {
+          setLoadingState(false);
+        }
+      }
+
+      async function updateConstant(key, value) {
+        if (isLoading) return;
+        setLoadingState(true);
+        try {
+          const response = await fetch("/api/admin/constants", {
+            method: "PUT",
+            headers: { "content-type": "application/json", ...getAuthHeaders() },
+            body: JSON.stringify({ key, value }),
+          });
+          const result = await response.json();
+          if (response.status === 401) {
+            authCredentials = null;
+            showLogin("Session expired. Please sign in again.");
+            return;
+          }
+          if (!response.ok) {
+            throw new Error(result.error || "Update failed.");
+          }
+          configState = result.config;
+          renderFormulaSection();
+          renderUsageFactors();
+          renderOverview();
+          renderCartridges();
+          showStatus(`Constant ${key} updated.`, "success");
+        } catch (error) {
+          console.error(error);
+          showStatus(error.message, "error");
+        } finally {
+          setLoadingState(false);
+        }
+      }
+
+      async function updateUsageFactor({
+        code,
+        labelTr,
+        labelEn,
+        percentage,
+        sortOrder,
+        isDefault,
+      }) {
+        if (isLoading) return;
+        setLoadingState(true);
+        try {
+          const response = await fetch("/api/admin/usage-factors", {
+            method: "PUT",
+            headers: { "content-type": "application/json", ...getAuthHeaders() },
+            body: JSON.stringify({
+              code,
+              labelTr,
+              labelEn,
+              percentage,
+              sortOrder,
+              isDefault,
+            }),
+          });
+          const result = await response.json();
+          if (response.status === 401) {
+            authCredentials = null;
+            showLogin("Session expired. Please sign in again.");
+            return;
+          }
+          if (!response.ok) {
+            throw new Error(result.error || "Update failed.");
+          }
+          configState = result.config;
+          renderUsageFactors();
+          renderFormulaSection();
+          renderOverview();
+          renderCartridges();
+          showStatus(`Efficiency option ${code} updated.`, "success");
+        } catch (error) {
+          console.error(error);
+          showStatus(error.message, "error");
+        } finally {
+          setLoadingState(false);
+        }
+      }
+
+      async function updateTheme(payload) {
+        if (isLoading) return;
+        setLoadingState(true);
+        try {
+          const response = await fetch("/api/admin/theme", {
+            method: "PUT",
+            headers: { "content-type": "application/json", ...getAuthHeaders() },
+            body: JSON.stringify(payload),
+          });
+          const result = await response.json();
+          if (response.status === 401) {
+            authCredentials = null;
+            showLogin("Session expired. Please sign in again.");
+            return;
+          }
+          if (!response.ok) {
+            throw new Error(result.error || "Update failed.");
+          }
+          configState = result.config;
+          renderTheme();
+          renderOverview();
+          showStatus("Theme updated.", "success");
+        } catch (error) {
+          console.error(error);
+          showStatus(error.message, "error");
+        } finally {
+          setLoadingState(false);
+        }
+      }
+
+      async function uploadProductImage(productCode, nominal, file) {
+        if (isLoading) return;
+        setLoadingState(true);
+        try {
+          const form = new FormData();
+          form.append("productCode", productCode);
+          form.append("nominal", nominal.toString());
+          form.append("file", file);
+          const response = await fetch("/api/admin/product-images", {
+            method: "PUT",
+            headers: { ...getAuthHeaders() },
+            body: form,
+          });
+          const result = await response.json();
+          if (response.status === 401) {
+            authCredentials = null;
+            showLogin("Session expired. Please sign in again.");
+            return;
+          }
+          if (!response.ok) {
+            throw new Error(result.error || "Upload failed.");
+          }
+          showStatus(`Image updated for ${productCode} ${nominal} ml.`, "success");
+        } catch (error) {
+          console.error(error);
+          showStatus(error.message, "error");
+        } finally {
+          setLoadingState(false);
+        }
+      }
+
+      async function deleteProductImage(productCode, nominal) {
+        if (isLoading) return;
+        setLoadingState(true);
+        try {
+          const response = await fetch(
+            `/api/admin/product-images?product=${encodeURIComponent(productCode)}&nominal=${encodeURIComponent(nominal)}`,
+            {
+              method: "DELETE",
+              headers: { ...getAuthHeaders() },
+            }
+          );
+          const result = await response.json();
+          if (response.status === 401) {
+            authCredentials = null;
+            showLogin("Session expired. Please sign in again.");
+            return;
+          }
+          if (!response.ok) {
+            throw new Error(result.error || "Delete failed.");
+          }
+          showStatus(`Image reset for ${productCode} ${nominal} ml.`, "success");
+        } catch (error) {
+          console.error(error);
+          showStatus(error.message, "error");
+        } finally {
+          setLoadingState(false);
+        }
+      }
+
+      async function saveAnchor(payload, successMessage) {
+        if (isLoading) return;
+        setLoadingState(true);
+        try {
+          const response = await fetch("/api/admin/anchors", {
+            method: "PUT",
+            headers: { "content-type": "application/json", ...getAuthHeaders() },
+            body: JSON.stringify(payload),
+          });
+          const result = await response.json();
+          if (response.status === 401) {
+            authCredentials = null;
+            showLogin("Session expired. Please sign in again.");
+            return;
+          }
+          if (!response.ok) {
+            throw new Error(result.error || "Update failed.");
+          }
+          configState = result.config;
+          ensureAnchorSelection();
+          renderAnchorControls();
+          renderAnchorTable();
+          ensureEtaSelection();
+          renderEtaControls();
+          renderEtaAnchors();
+          renderOverview();
+          showStatus(successMessage, "success");
+        } catch (error) {
+          console.error(error);
+          showStatus(error.message, "error");
+        } finally {
+          setLoadingState(false);
+        }
+      }
+
+      async function updateEtaAssignment({ productCode, barType, anchorId, enabled }) {
+        if (isLoading) return;
+        setLoadingState(true);
+        try {
+          const response = await fetch("/api/admin/eta", {
+            method: "PUT",
+            headers: { "content-type": "application/json", ...getAuthHeaders() },
+            body: JSON.stringify({ productCode, barType, anchorId, enabled }),
+          });
+          const result = await response.json();
+          if (response.status === 401) {
+            authCredentials = null;
+            showLogin("Session expired. Please sign in again.");
+            return;
+          }
+          if (!response.ok) {
+            throw new Error(result.error || "Update failed.");
+          }
+          configState = result.config;
+          ensureEtaSelection();
+          renderEtaControls();
+          renderEtaAnchors();
+          renderOverview();
+          showStatus(`ETA for ${anchorId} (${barType}) updated.`, "success");
+        } catch (error) {
+          console.error(error);
+          showStatus(error.message, "error");
+        } finally {
+          setLoadingState(false);
+        }
+      }
+
+      document.getElementById("loginForm").addEventListener("submit", async (event) => {
+        event.preventDefault();
+        const form = event.target;
+        const username = form.username.value.trim();
+        const password = form.password.value;
+        if (!username || !password) {
+          document.getElementById("loginError").textContent = "Username and password are required.";
+          return;
+        }
+        authCredentials = { username, password };
+        await fetchConfig();
+        if (configState) {
+          hideLogin();
+          showStatus("Signed in.", "success");
+        } else {
+          authCredentials = null;
+          document.getElementById("loginError").textContent = "Invalid credentials.";
+        }
+      });
+
+      showLogin();
+    </script>
+  </body>
+</html>

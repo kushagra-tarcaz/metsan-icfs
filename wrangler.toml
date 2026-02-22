@@ -1,0 +1,11 @@
+name = "metsan-calculation"
+compatibility_date = "2024-05-21"
+pages_build_output_dir = "public"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "calculator-config"
+# TODO: replace with the actual database_id after creating the D1 instance.
+database_id = "c259f6c8-2902-420e-bd16-77b38b4054db"
+
+

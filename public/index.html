@@ -1,0 +1,1591 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <title>METSAN Calculator</title>
+  <!-- (Optional) Bootstrap CSS -->
+  <link 
+    rel="stylesheet"
+    href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+  >
+  <style>
+    :root {
+      --brand-green: #8CCE41; /* brand color */
+      --page-bg: #f5f9fc;
+      --card-bg: #ffffff;
+    }
+    body {
+      background-color: var(--page-bg);
+      font-family: Arial, sans-serif;
+      margin-bottom: 50px;
+    }
+    .indexmor-calc {
+      padding: 20px 0;
+    }
+    .logo-container {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    .logo-container img {
+      max-height: 80px;
+    }
+    .item-shadow {
+      background: var(--card-bg);
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+      padding: 20px;
+      border-radius: 4px;
+    }
+    .item-title {
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    .item-title .order {
+      display: inline-block;
+      background: var(--brand-green);
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      text-align: center;
+      line-height: 28px;
+      margin-right: 10px;
+      color: #000;
+    }
+    .item-subtitle {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #555;
+      margin-bottom: 5px;
+    }
+    .rangeDiv {
+      position: relative;
+      margin: 15px 0;
+    }
+    .rangeBubble {
+      position: absolute;
+      top: -35px;
+    }
+    .rangeBubble .number {
+      background: var(--brand-green);
+      color: #000;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+    .rangeTopValues {
+      display: flex;
+      justify-content: space-between;
+      color: #666;
+      font-size: 0.8rem;
+    }
+    .input-number {
+      width: 90px;
+      text-align: center;
+    }
+    .resumeConcrete {
+      background: var(--card-bg);
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 4px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+    .resumeConcrete .item-title.more {
+      font-size: 1.1rem;
+      margin-bottom: 10px;
+    }
+    .resumeConcrete .item-subtitle {
+      font-size: 0.8rem;
+      font-weight: bold;
+      color: #555;
+    }
+    .resumeConcrete .item-data {
+      font-size: 1rem;
+      color: #000;
+    }
+    .eta-label {
+      font-weight: bold; 
+      margin-left: 5px;
+    }
+    .eta-approved {
+      color: green;
+    }
+    .eta-notapproved {
+      color: red;
+    }
+
+    /* Cartridge row with bigger text + uniform images */
+    .cartridge-row {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+      font-size: 1.1rem;
+    }
+    .cartridge-img-wrapper {
+      width: 80px;
+      height: 160px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      margin-right: 12px;
+    }
+    .cartridge-img-wrapper img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      display: block;
+    }
+    .eta-icon-inline {
+      width: auto; 
+      height: 50px;
+      vertical-align: middle;
+      margin-left: 5px;
+    }
+
+    .print-only {
+      display: none;
+    }
+
+    .report-actions {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 12px;
+    }
+
+    .report-button {
+      background: #1f8a2c;
+      border-color: #1f8a2c;
+      color: #f0fdf4;
+    }
+    .report-images {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 12px;
+      align-items: start;
+    }
+    .report-image-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+    .report-image-item img {
+      max-width: 100%;
+      max-height: 220px;
+      object-fit: contain;
+      display: block;
+    }
+    .report-image-label {
+      font-size: 12px;
+      color: #374151;
+    }
+    #printReport.pdf-export {
+      padding: 24px;
+      width: 794px;
+      background: #fff;
+      color: #000;
+    }
+    #printReport.pdf-export .report-card {
+      border: 1px solid #e5e7eb;
+      box-shadow: none;
+      padding: 16px;
+      margin-bottom: 16px;
+    }
+    #printReport.pdf-export table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    #printReport.pdf-export th,
+    #printReport.pdf-export td {
+      border-bottom: 1px solid #e5e7eb;
+      padding: 6px 4px;
+      text-align: left;
+      font-size: 12px;
+    }
+    #printReport.pdf-export th {
+      text-transform: uppercase;
+      font-size: 11px;
+      letter-spacing: 0.03em;
+    }
+    #printReport.pdf-export .report-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    #printReport.pdf-export .report-logo {
+      max-height: 48px;
+    }
+    #printReport.pdf-export .report-title {
+      font-size: 18px;
+      font-weight: bold;
+    }
+    #printReport.pdf-export .report-meta {
+      font-size: 12px;
+      color: #374151;
+    }
+
+    @media print {
+      body {
+        background: #fff;
+        margin: 0;
+      }
+      body > *:not(#printReport) {
+        display: none !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+      .print-only {
+        display: block !important;
+      }
+      #printReport {
+        padding: 24px;
+      }
+      #printReport .report-card {
+        border: 1px solid #e5e7eb;
+        box-shadow: none;
+        padding: 16px;
+        margin-bottom: 16px;
+      }
+      #printReport table {
+        width: 100%;
+        border-collapse: collapse;
+      }
+      #printReport th,
+      #printReport td {
+        border-bottom: 1px solid #e5e7eb;
+        padding: 6px 4px;
+        text-align: left;
+        font-size: 12px;
+      }
+      #printReport th {
+        text-transform: uppercase;
+        font-size: 11px;
+        letter-spacing: 0.03em;
+      }
+      #printReport .report-header {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 16px;
+      }
+      #printReport .report-logo {
+        max-height: 48px;
+      }
+      #printReport .report-title {
+        font-size: 18px;
+        font-weight: bold;
+      }
+      #printReport .report-meta {
+        font-size: 12px;
+        color: #374151;
+      }
+    }
+    
+    /* Language Switcher */
+    .lang-switcher {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 1000;
+    }
+    .lang-switcher .btn-group .btn {
+      padding: 5px 15px;
+      font-size: 14px;
+      border: 2px solid var(--brand-green);
+    }
+    .lang-switcher .btn-group .btn.active {
+      background-color: var(--brand-green);
+      color: #000;
+      font-weight: bold;
+    }
+    .lang-switcher .btn-group .btn:not(.active) {
+      background-color: #fff;
+      color: var(--brand-green);
+    }
+    .eta-toggle {
+      background-color: #2563eb;
+      border: 2px solid #2563eb;
+      color: #fff;
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+      border-radius: 6px;
+      padding: 6px 14px;
+      transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+    }
+    .eta-toggle.active {
+      background-color: #1d4ed8;
+      border-color: #1d4ed8;
+      color: #fff;
+    }
+    .eta-toggle.eta-approved {
+      border-color: #22c55e;
+      box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.25);
+    }
+    .eta-toggle.eta-approved.active {
+      background-color: #1f8a2c;
+      border-color: #1f8a2c;
+      color: #f0fdf4;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Language Switcher -->
+<div class="lang-switcher">
+  <div class="btn-group" role="group">
+    <button type="button" class="btn btn-outline-primary active" onclick="switchLanguage('tr')">TR</button>
+    <button type="button" class="btn btn-outline-primary" onclick="switchLanguage('en')">EN</button>
+  </div>
+</div>
+
+<section class="indexmor-calc">
+  <div class="container">
+
+    <!-- Optional Logo at the top -->
+    <div class="logo-container">
+      <img src="assets/logo.png" alt="Company Logo">
+    </div>
+
+    <div class="row">
+      <!-- LEFT COLUMN -->
+      <div class="col-lg-7 col-xs-12">
+        <!-- (1) Product Selection -->
+        <div class="col-12 item-shadow">
+          <div class="item-title">
+            <span class="order">1</span> <span id="title1">Ürün Seçimi</span>
+          </div>
+          <div class="item-subtitle"><span id="subtitle1">Hangi kimyasal ürün kullanılacak?</span></div>
+          <select id="selectProduct" class="form-control">
+            <option value=""></option>
+          </select>
+        </div>
+
+        <!-- (2) Bar Type -->
+        <div class="col-12 item-shadow">
+          <div class="item-title">
+            <span class="order">2</span> <span id="title2">Bağlama Tipi</span>
+          </div>
+          <div class="item-subtitle"><span id="subtitle2">Threaded Bar mı, Rebar mı?</span></div>
+          <div class="btn-group">
+            <label class="btn btn-primary">
+              <input type="radio" name="barType" value="threaded" autocomplete="off">
+              Threaded Bar
+            </label>
+            <label class="btn btn-primary">
+              <input type="radio" name="barType" value="rebar" autocomplete="off">
+              Rebar
+            </label>
+          </div>
+        </div>
+
+        <!-- (3) Anchor Choice -->
+        <div class="col-12 item-shadow">
+          <div class="item-title">
+            <span class="order">3</span> <span id="title3">Ölçü Seçimi</span>
+          </div>
+          <div id="anchorContainer"></div>
+
+          <!-- d0 as a dropdown -->
+          <div class="mt-2">
+            <label id="labelD0">Delik Çapı (d<sub>0</sub>):</label>
+            <select id="dropdownD0" class="form-control" style="max-width:120px; display:inline-block;"></select>
+            <span id="etaDiameterLabel" class="eta-label"></span>
+          </div>
+          <!-- Depth slider + numeric -->
+          <div class="mt-3">
+            <div class="item-subtitle"><span id="labelHef">Delik Derinliği (h<sub>ef</sub>):</span></div>
+            <div class="rangeDiv">
+              <input 
+                type="range"
+                class="input-range form-control-range"
+                id="rangeDepth"
+                min="60"
+                max="1000"
+                value="80"
+                oninput="updateDepthSlider(this)"
+              >
+              <output id="bubbleDepth" class="rangeBubble">
+                <div class="number">80</div>
+              </output>
+              <div class="rangeTopValues">
+                <div>60</div><div>250</div><div>500</div><div>750</div><div>1000</div>
+              </div>
+            </div>
+            <input 
+              type="number"
+              class="input-number"
+              id="textDepth"
+              value="80"
+              min="60"
+              max="1000"
+              oninput="updateDepthNumber(this)"
+            >
+            <span id="etaDepthLabel" class="eta-label"></span>
+          </div>
+        </div>
+
+        <!-- (4) Number of holes -->
+        <div class="col-12 item-shadow">
+          <div class="item-title">
+            <span class="order">4</span> <span id="title4">Kaç adet delik doldurulacak?</span>
+          </div>
+          <div class="item-subtitle"><span id="subtitle4">Adet</span></div>
+          <div class="rangeDiv">
+            <input 
+              type="range"
+              class="input-range form-control-range"
+              id="rangeHoles"
+              min="0"
+              max="5000"
+              value="500"
+              oninput="updateHolesSlider(this)"
+            >
+            <output id="bubbleHoles" class="rangeBubble">
+              <div class="number">500</div>
+            </output>
+            <div class="rangeTopValues">
+              <div>0</div><div>1250</div><div>2500</div><div>3750</div><div>5000</div>
+            </div>
+          </div>
+          <input 
+            type="number"
+            class="input-number"
+            id="textHoles"
+            value="500"
+            max="5000"
+            oninput="updateHolesNumber(this)"
+          >
+        </div>
+
+        <!-- (5) Efficiency -->
+        <div class="col-12 item-shadow">
+          <div class="item-title">
+            <span class="order">5</span> <span id="title5">Verimlilik</span>
+          </div>
+          <div class="btn-group" id="efficiencyGroup"></div>
+        </div>
+      </div>
+
+      <!-- RIGHT COLUMN (Summary) -->
+      <div class="col-lg-5 col-xs-12 item-flex">
+        <div class="item-shadow resume resumeConcrete">
+          <div class="item-title more"><span id="summaryTitle">Özet</span></div>
+          <div class="row">
+            <div class="col-xl-6 col-lg-12">
+              <div class="item-subtitle"><span id="summaryLabel1">Ürün:</span></div>
+              <div class="item-data" id="summaryProduct">—</div>
+            </div>
+            <div class="col-xl-6 col-lg-12">
+              <div class="item-subtitle"><span id="summaryLabel2">Bağlama Tipi:</span></div>
+              <div class="item-data" id="summaryBarType">—</div>
+            </div>
+          </div>
+          <div class="row mt-2">
+            <div class="col-xl-6 col-lg-12">
+              <div class="item-subtitle"><span id="summaryLabel3">Ölçü:</span></div>
+              <div class="item-data" id="summaryAnchor">—</div>
+            </div>
+            <div class="col-xl-6 col-lg-12">
+              <div class="item-subtitle"><span id="summaryLabel4">Delik Çapı (d<sub>0</sub>):</span></div>
+              <div class="item-data" id="summaryD0">—</div>
+            </div>
+          </div>
+          <div class="row mt-2">
+            <div class="col-xl-6 col-lg-12">
+              <div class="item-subtitle"><span id="summaryLabel5">Derinlik (h<sub>ef</sub>):</span></div>
+              <div class="item-data" id="summaryDepth">0</div>
+            </div>
+            <div class="col-xl-6 col-lg-12">
+              <div class="item-subtitle"><span id="summaryLabel6">Verimlilik:</span></div>
+              <div class="item-data" id="summaryEfficiency">Standart</div>
+            </div>
+          </div>
+          <div class="row mt-2">
+            <div class="col-xl-6 col-lg-12">
+              <div class="item-subtitle"><span id="summaryLabel7">Effective ml (1 delik):</span></div>
+              <div class="item-data" id="summaryEffMlOne">0</div>
+            </div>
+            <div class="col-xl-6 col-lg-12">
+              <div class="item-subtitle"><span id="summaryLabel8">Toplam Hacim (ml):</span></div>
+              <div class="item-data" id="summaryTotalVolume">0</div>
+            </div>
+          </div>
+          <div class="row mt-2">
+            <div class="col-xl-6 col-lg-12">
+              <div class="item-subtitle"><span id="summaryLabel9">Delik Adedi:</span></div>
+              <div class="item-data" id="summaryHoles">0</div>
+            </div>
+            <div class="col-xl-6 col-lg-12">
+              <div class="item-subtitle">ETA Range (h<sub>min</sub>..h<sub>max</sub>):</div>
+              <div class="item-data" id="summaryEtaRange">—</div>
+            </div>
+          </div>
+
+          <div class="item-title mt-3"><span id="cartridgeTitle">Kartuş Adedi</span></div>
+          <div id="cartridgeRows"></div>
+          <div class="report-actions no-print">
+            <button class="btn btn-success report-button" id="downloadPdfBtn">PDF indir</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="printReport" class="print-only">
+  <div class="report-header">
+    <img src="assets/logo.png" alt="Company Logo" class="report-logo">
+    <div>
+      <div class="report-title" id="reportTitle">Rapor</div>
+      <div class="report-meta" id="reportGenerated">Oluşturma: --</div>
+      <div class="report-meta" id="reportSource">from calculation.metsan.gen.tr</div>
+    </div>
+  </div>
+  <div class="report-card">
+    <table>
+      <tbody>
+        <tr><th id="reportLabelProject">Proje</th><td id="reportProject">—</td></tr>
+        <tr><th id="reportLabelProduct">Ürün</th><td id="reportProduct">—</td></tr>
+        <tr><th id="reportLabelBarType">Bağlama Tipi</th><td id="reportBarType">—</td></tr>
+        <tr><th id="reportLabelAnchor">Ölçü</th><td id="reportAnchor">—</td></tr>
+        <tr><th id="reportLabelD0">Delik Çapı (d0)</th><td id="reportD0">—</td></tr>
+        <tr><th id="reportLabelDepth">Derinlik (hef)</th><td id="reportDepth">—</td></tr>
+        <tr><th id="reportLabelEffMlOne">Delik ML (1 delik)</th><td id="reportEffMlOne">—</td></tr>
+        <tr><th id="reportLabelHoles">Delik Adedi</th><td id="reportHoles">—</td></tr>
+        <tr><th id="reportLabelEfficiency">Verimlilik</th><td id="reportEfficiency">—</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="report-card">
+    <div class="report-title" id="reportCartridgeTitle">Kartuş Adedi</div>
+    <table>
+      <thead>
+        <tr>
+          <th id="reportCartridgeHeaderSize">Kartuş</th>
+          <th id="reportCartridgeHeaderNeeded">Adet</th>
+          <th id="reportCartridgeHeaderHoles">Delik/Kartuş</th>
+        </tr>
+      </thead>
+      <tbody id="reportCartridgeRows">
+        <tr><td colspan="3">—</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="report-card">
+    <div class="report-title" id="reportImagesTitle">Ürün Görselleri</div>
+    <div id="reportProductImages" class="report-images"></div>
+  </div>
+</section>
+
+<!-- jQuery etc. -->
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+<script 
+  src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js">
+</script>
+<script 
+  src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js">
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+<script>
+// ===== 0) Internationalization =====
+let currentLanguage = 'tr';
+
+const translations = {
+  tr: {
+    title1: "Ürün Seçimi",
+    subtitle1: "Hangi kimyasal ürün kullanılacak?",
+    title2: "Bağlama Tipi",
+    subtitle2: "Threaded Bar mı, Rebar mı?",
+    title3: "Ölçü Seçimi",
+    labelD0: "Delik Çapı (d₀):",
+    labelHef: "Delik Derinliği (hₑf):",
+    title4: "Kaç adet delik doldurulacak?",
+    subtitle4: "Adet",
+    title5: "Verimlilik",
+    efficiencyStandard: "Standart",
+    efficiencyOptimized: "Optimize",
+    summaryTitle: "Özet",
+    summaryLabel1: "Ürün:",
+    summaryLabel2: "Bağlama Tipi:",
+    summaryLabel3: "Ölçü:",
+    summaryLabel4: "Delik Çapı (d₀):",
+    summaryLabel5: "Derinlik (hₑf):",
+    summaryLabel6: "Verimlilik:",
+    summaryLabel7: "Effective ml (1 delik):",
+    summaryLabel8: "Toplam Hacim (ml):",
+    summaryLabel9: "Delik Adedi:",
+    cartridgeTitle: "Kartuş Adedi",
+    cartridgeCount: "kartuş",
+    holesPerCartridge: "delik/kartuş",
+    downloadPdf: "PDF indir",
+    projectNamePrompt: "Proje adı:",
+    projectNameLabel: "Proje:",
+    reportLabelProject: "Proje",
+    reportTitle: "Kimyasal Dübel Sarfiyat Raporu",
+    reportGenerated: "Oluşturma:",
+    reportSource: "from calculation.metsan.gen.tr",
+    reportLabelProduct: "Ürün",
+    reportLabelBarType: "Bağlama Tipi",
+    reportLabelAnchor: "Ölçü",
+    reportLabelD0: "Delik Çapı (d0)",
+    reportLabelDepth: "Derinlik (hef)",
+    reportLabelEffMlOne: "Delik ML (1 delik)",
+    reportLabelHoles: "Delik Adedi",
+    reportLabelEfficiency: "Verimlilik",
+    reportCartridgeTitle: "Kartuş Adedi",
+    reportCartridgeHeaderSize: "Kartuş",
+    reportCartridgeHeaderNeeded: "Adet",
+    reportCartridgeHeaderHoles: "Delik/Kartuş",
+    reportImagesTitle: "Ürün Görselleri",
+    etaApproved: "ETA Onaylı",
+    etaExternal: "ETA Harici",
+    holeText: "delik",
+    oneHole: "delik",
+    threaded: "Threaded Bar",
+    rebar: "Rebar",
+    anchorPrompt: "Lütfen ürün ve bağlama tipi seçiniz.",
+    invalidProduct: "Geçersiz ürün.",
+    selectProduct: "Lütfen ürün seçiniz.",
+    loadingConfig: "Konfigürasyon yükleniyor…",
+    configError: "Konfigürasyon yüklenemedi."
+  },
+  en: {
+    title1: "Product Selection",
+    subtitle1: "Which chemical product will be used?",
+    title2: "Binding Type",
+    subtitle2: "Threaded Bar or Rebar?",
+    title3: "Measurement Selection",
+    labelD0: "Hole Diameter (d₀):",
+    labelHef: "Hole Depth (hₑf):",
+    title4: "How many holes to fill?",
+    subtitle4: "Quantity",
+    title5: "Efficiency",
+    efficiencyStandard: "Standard",
+    efficiencyOptimized: "Optimized",
+    summaryTitle: "Summary",
+    summaryLabel1: "Product:",
+    summaryLabel2: "Binding Type:",
+    summaryLabel3: "Measurement:",
+    summaryLabel4: "Hole Diameter (d₀):",
+    summaryLabel5: "Depth (hₑf):",
+    summaryLabel6: "Efficiency:",
+    summaryLabel7: "Effective ml (1 hole):",
+    summaryLabel8: "Total Volume (ml):",
+    summaryLabel9: "Hole Count:",
+    cartridgeTitle: "Number of Cartridges",
+    cartridgeCount: "cartridges",
+    holesPerCartridge: "holes/cartridge",
+    downloadPdf: "Download PDF",
+    projectNamePrompt: "Project name:",
+    projectNameLabel: "Project:",
+    reportLabelProject: "Project",
+    reportTitle: "Chemical Anchor Consumption Report",
+    reportGenerated: "Generated:",
+    reportSource: "from calculation.metsan.gen.tr",
+    reportLabelProduct: "Product",
+    reportLabelBarType: "Binding Type",
+    reportLabelAnchor: "Anchor",
+    reportLabelD0: "Hole Diameter (d0)",
+    reportLabelDepth: "Depth (hef)",
+    reportLabelEffMlOne: "Per-hole volume (ml)",
+    reportLabelHoles: "Hole Count",
+    reportLabelEfficiency: "Efficiency",
+    reportCartridgeTitle: "Cartridges",
+    reportCartridgeHeaderSize: "Cartridge",
+    reportCartridgeHeaderNeeded: "Needed",
+    reportCartridgeHeaderHoles: "Holes/Cartridge",
+    reportImagesTitle: "Product Images",
+    etaApproved: "ETA Approved",
+    etaExternal: "ETA External",
+    holeText: "hole",
+    oneHole: "hole",
+    threaded: "Threaded Bar",
+    rebar: "Rebar",
+    anchorPrompt: "Please select a product and binding type.",
+    invalidProduct: "Invalid product.",
+    selectProduct: "Please select a product.",
+    loadingConfig: "Loading configuration…",
+    configError: "Failed to load configuration."
+  }
+};
+
+let calculatorConfig = null;
+const productMap = {};
+let formulaConstants = {};
+let efficiencyOptions = [];
+const efficiencyMap = {};
+let selectedEfficiencyCode = null;
+let etaAssignments = {};
+
+async function loadInitialConfig() {
+  const anchorContainer = document.getElementById('anchorContainer');
+  const cartridgeContainer = document.getElementById('cartridgeRows');
+  renderContainerMessage(anchorContainer, "loading");
+  renderContainerMessage(cartridgeContainer, "loading");
+
+  try {
+    const response = await fetch("/api/config", { headers: { "accept": "application/json" } });
+    if (!response.ok) throw new Error(`Config request failed with status ${response.status}`);
+    const data = await response.json();
+    initializeConfig(data);
+    populateProductDropdown();
+    renderEfficiencyRadios();
+    renderContainerMessage(anchorContainer, null);
+    renderContainerMessage(cartridgeContainer, null);
+    updateUI();
+    updateReportLabels();
+  } catch (error) {
+    console.error("Unable to load configuration", error);
+    renderContainerMessage(anchorContainer, "error");
+    renderContainerMessage(cartridgeContainer, "error");
+  }
+}
+
+function initializeConfig(config) {
+  calculatorConfig = config;
+  Object.keys(productMap).forEach((key) => delete productMap[key]);
+  (config.products || []).forEach((product) => {
+    productMap[product.code] = product;
+  });
+  formulaConstants = config.constants || {};
+  efficiencyOptions = (config.usageFactors || [])
+    .filter((factor) => factor.code === "standard" || factor.code === "optimized")
+    .slice()
+    .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0))
+    .map((factor) => ({
+      code: factor.code,
+      labelTr: factor.labelTr,
+      labelEn: factor.labelEn,
+      sortOrder: factor.sortOrder,
+      isDefault: factor.isDefault,
+    }));
+  if (!efficiencyOptions.length) {
+    efficiencyOptions = [
+      {
+        code: "standard",
+        labelTr: translations.tr.efficiencyStandard,
+        labelEn: translations.en.efficiencyStandard,
+        sortOrder: 1,
+        isDefault: true,
+      },
+      {
+        code: "optimized",
+        labelTr: translations.tr.efficiencyOptimized,
+        labelEn: translations.en.efficiencyOptimized,
+        sortOrder: 2,
+        isDefault: false,
+      },
+    ];
+  }
+  Object.keys(efficiencyMap).forEach((key) => delete efficiencyMap[key]);
+  efficiencyOptions.forEach((option) => {
+    efficiencyMap[option.code] = option;
+  });
+  etaAssignments = config.etaAssignments || {};
+  if (!selectedEfficiencyCode) {
+    const defaultOption = efficiencyOptions.find((opt) => opt.isDefault) || efficiencyOptions[0];
+    if (defaultOption) selectedEfficiencyCode = defaultOption.code;
+  } else if (!efficiencyMap[selectedEfficiencyCode] && efficiencyOptions.length) {
+    selectedEfficiencyCode = efficiencyOptions[0].code;
+  }
+  applyTheme(config.theme || null);
+}
+
+function applyTheme(theme) {
+  if (!theme) return;
+  const root = document.documentElement;
+  if (theme.brandColor) root.style.setProperty("--brand-green", theme.brandColor);
+  if (theme.pageBackground) root.style.setProperty("--page-bg", theme.pageBackground);
+  if (theme.cardBackground) root.style.setProperty("--card-bg", theme.cardBackground);
+}
+
+function populateProductDropdown() {
+  if (!calculatorConfig) return;
+  const select = document.getElementById("selectProduct");
+  if (!select) return;
+  const previousValue = select.value;
+  select.innerHTML = '<option value=""></option>';
+  calculatorConfig.products.forEach((product) => {
+    const option = document.createElement("option");
+    option.value = product.code;
+    option.textContent = product.displayName;
+    select.appendChild(option);
+  });
+  if (previousValue && productMap[previousValue]) {
+    select.value = previousValue;
+  } else if (!previousValue && calculatorConfig.products.length) {
+    select.value = calculatorConfig.products[0].code;
+  }
+}
+
+function renderEfficiencyRadios() {
+  const container = document.getElementById("efficiencyGroup");
+  if (!container) return;
+  container.innerHTML = "";
+
+  if (!efficiencyOptions.length) {
+    container.innerHTML = "<span>No efficiency options configured.</span>";
+    return;
+  }
+
+  efficiencyOptions.forEach((option, index) => {
+    const label = document.createElement("label");
+    label.className = "btn btn-primary";
+    label.dataset.code = option.code;
+
+    const input = document.createElement("input");
+    input.type = "radio";
+    input.name = "efficiency";
+    input.autocomplete = "off";
+    input.value = option.code;
+
+    if (!selectedEfficiencyCode && index === 0) {
+      selectedEfficiencyCode = option.code;
+    }
+    if (option.code === selectedEfficiencyCode) {
+      input.checked = true;
+      label.classList.add("active");
+    }
+
+    input.addEventListener("change", () => {
+      selectedEfficiencyCode = option.code;
+      updateEfficiencyActiveState();
+      updateSummary();
+    });
+
+    const span = document.createElement("span");
+    span.className = "efficiency-label";
+    span.dataset.code = option.code;
+    span.textContent = getEfficiencyLabel(option);
+
+    label.appendChild(input);
+    label.appendChild(span);
+    container.appendChild(label);
+  });
+
+  updateEfficiencyActiveState();
+  updateSummary();
+}
+
+function updateEfficiencyActiveState() {
+  const container = document.getElementById("efficiencyGroup");
+  if (!container) return;
+  container.querySelectorAll("label").forEach((label) => {
+    const code = label.dataset.code;
+    if (code === selectedEfficiencyCode) {
+      label.classList.add("active");
+      const input = label.querySelector("input[type='radio']");
+      if (input) input.checked = true;
+    } else {
+      label.classList.remove("active");
+      const input = label.querySelector("input[type='radio']");
+      if (input) input.checked = false;
+    }
+  });
+  updateEfficiencyLabels();
+}
+
+function updateEfficiencyLabels() {
+  const labels = document.querySelectorAll(".efficiency-label");
+  labels.forEach((label) => {
+    const option = efficiencyMap[label.dataset.code];
+    if (option) {
+      label.textContent = getEfficiencyLabel(option);
+    }
+  });
+}
+
+function getEfficiencyLabel(option) {
+  return currentLanguage === "tr" ? option.labelTr : option.labelEn;
+}
+
+function updateReportTimestamp() {
+  const t = translations[currentLanguage];
+  const el = document.getElementById("reportGenerated");
+  if (!el) return;
+  const locale = currentLanguage === "tr" ? "tr-TR" : "en-US";
+  const formatted = new Date().toLocaleString(locale, {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+  el.textContent = `${t.reportGenerated} ${formatted}`;
+}
+
+function updateReportLabels() {
+  const t = translations[currentLanguage];
+  const setText = (id, value) => {
+    const el = document.getElementById(id);
+    if (el) el.textContent = value;
+  };
+  setText("downloadPdfBtn", t.downloadPdf);
+  setText("reportTitle", t.reportTitle);
+  setText("reportLabelProject", t.reportLabelProject);
+  setText("reportLabelProduct", t.reportLabelProduct);
+  setText("reportLabelBarType", t.reportLabelBarType);
+  setText("reportLabelAnchor", t.reportLabelAnchor);
+  setText("reportLabelD0", t.reportLabelD0);
+  setText("reportLabelDepth", t.reportLabelDepth);
+  setText("reportLabelEffMlOne", t.reportLabelEffMlOne);
+  setText("reportLabelHoles", t.reportLabelHoles);
+  setText("reportLabelEfficiency", t.reportLabelEfficiency);
+  setText("reportSource", t.reportSource);
+  setText("reportCartridgeTitle", t.reportCartridgeTitle);
+  setText("reportCartridgeHeaderSize", t.reportCartridgeHeaderSize);
+  setText("reportCartridgeHeaderNeeded", t.reportCartridgeHeaderNeeded);
+  setText("reportCartridgeHeaderHoles", t.reportCartridgeHeaderHoles);
+  setText("reportImagesTitle", t.reportImagesTitle);
+  updateReportTimestamp();
+}
+
+function setReportProjectName(projectName) {
+  const rowEl = document.getElementById("reportProject");
+  if (rowEl) {
+    rowEl.textContent = projectName || "—";
+  }
+}
+
+function buildReportImages(productCode) {
+  const container = document.getElementById("reportProductImages");
+  if (!container) return [];
+  container.innerHTML = "";
+  if (!productCode) {
+    container.innerHTML = "<em>—</em>";
+    return [];
+  }
+  const cartridges = getCartridgesForProduct(productCode);
+  if (!cartridges.length) {
+    container.innerHTML = "<em>—</em>";
+    return [];
+  }
+  const images = [];
+  cartridges.forEach(({ nominal }) => {
+    const wrapper = document.createElement("div");
+    wrapper.className = "report-image-item";
+    const img = document.createElement("img");
+    img.src = `/api/assets/product-image?product=${encodeURIComponent(productCode)}&nominal=${encodeURIComponent(nominal)}`;
+    img.alt = `${productCode}-${nominal}`;
+    img.loading = "eager";
+    img.decoding = "async";
+    const label = document.createElement("div");
+    label.className = "report-image-label";
+    label.textContent = `${nominal} ml`;
+    wrapper.appendChild(img);
+    wrapper.appendChild(label);
+    container.appendChild(wrapper);
+    images.push(img);
+  });
+  return images;
+}
+
+function waitForImages(images) {
+  return Promise.all(
+    images.map(
+      (img) =>
+        new Promise((resolve) => {
+          if (img.complete && img.naturalWidth > 0) {
+            resolve();
+            return;
+          }
+          const done = () => resolve();
+          img.addEventListener("load", done, { once: true });
+          img.addEventListener("error", done, { once: true });
+        })
+    )
+  );
+}
+
+async function generatePdfFromReport(reportEl) {
+  const jspdf = window.jspdf;
+  if (!jspdf || !jspdf.jsPDF) {
+    throw new Error("PDF library missing");
+  }
+  const canvas = await html2canvas(reportEl, {
+    scale: 2,
+    useCORS: true,
+    backgroundColor: "#ffffff",
+  });
+  const imgData = canvas.toDataURL("image/png");
+  const pdf = new jspdf.jsPDF("p", "pt", "a4");
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const pageHeight = pdf.internal.pageSize.getHeight();
+  const imgWidth = pageWidth;
+  const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+  let heightLeft = imgHeight;
+  let position = 0;
+  pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+  heightLeft -= pageHeight;
+
+  while (heightLeft > 0) {
+    position = heightLeft - imgHeight;
+    pdf.addPage();
+    pdf.addImage(imgData, "PNG", 0, position, imgWidth, imgHeight);
+    heightLeft -= pageHeight;
+  }
+  return pdf;
+}
+
+async function downloadReport() {
+  const t = translations[currentLanguage];
+  const projectNameRaw = window.prompt(t.projectNamePrompt);
+  if (projectNameRaw === null) return;
+  const projectName = projectNameRaw.trim();
+  if (!projectName) {
+    alert(t.projectNamePrompt);
+    return;
+  }
+
+  setReportProjectName(projectName);
+  updateReportTimestamp();
+
+  const reportEl = document.getElementById("printReport");
+  if (!reportEl) return;
+
+  const previousStyle = {
+    display: reportEl.style.display,
+    position: reportEl.style.position,
+    left: reportEl.style.left,
+    top: reportEl.style.top,
+  };
+  const hadExportClass = reportEl.classList.contains("pdf-export");
+
+  reportEl.style.display = "block";
+  reportEl.style.position = "absolute";
+  reportEl.style.left = "-9999px";
+  reportEl.style.top = "0";
+  reportEl.classList.add("pdf-export");
+
+  try {
+    const productCode = document.getElementById("selectProduct").value;
+    const images = buildReportImages(productCode);
+    await waitForImages(images);
+
+    const pdf = await generatePdfFromReport(reportEl);
+    const dateStamp = new Date().toISOString().slice(0, 10);
+    const safeProject = projectName.replace(/[^a-zA-Z0-9-_]+/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "");
+    const filename = `metsan-consumption-${safeProject}-${dateStamp}.pdf`;
+
+    pdf.save(filename);
+  } finally {
+    reportEl.style.display = previousStyle.display;
+    reportEl.style.position = previousStyle.position;
+    reportEl.style.left = previousStyle.left;
+    reportEl.style.top = previousStyle.top;
+    if (!hadExportClass) {
+      reportEl.classList.remove("pdf-export");
+    }
+  }
+}
+
+function getSelectedEfficiency() {
+  if (!selectedEfficiencyCode) return null;
+  return efficiencyMap[selectedEfficiencyCode] || null;
+}
+
+function getGroupConfig(productCode) {
+  if (!calculatorConfig) return null;
+  const product = productMap[productCode];
+  if (!product) return null;
+  return calculatorConfig.groups[product.group] || null;
+}
+
+function getEtaConfig(productCode) {
+  return etaAssignments?.[productCode] || { threaded: {}, rebar: {} };
+}
+
+function isEtaAnchorApproved(productCode, barType, anchorId) {
+  const etaConfig = getEtaConfig(productCode);
+  const map = etaConfig?.[barType];
+  if (!map) return false;
+  return !!map[anchorId];
+}
+
+function renderContainerMessage(container, stateKey) {
+  if (!container) return;
+  const t = translations[currentLanguage];
+  if (!stateKey) {
+    container.innerHTML = "";
+    delete container.dataset.state;
+    return;
+  }
+  container.dataset.state = stateKey;
+  switch (stateKey) {
+    case "needsSelection":
+      container.innerHTML = `<em>${t.anchorPrompt}</em>`;
+      break;
+    case "invalidProduct":
+      container.innerHTML = `<em>${t.invalidProduct}</em>`;
+      break;
+    case "needsProduct":
+      container.innerHTML = `<em>${t.selectProduct}</em>`;
+      break;
+    case "loading":
+      container.innerHTML = `<em>${t.loadingConfig}</em>`;
+      break;
+    case "error":
+      container.innerHTML = `<em>${t.configError}</em>`;
+      break;
+    default:
+      container.innerHTML = "";
+      delete container.dataset.state;
+  }
+}
+
+function getProduct(productCode) {
+  return productMap[productCode] || null;
+}
+
+function getProductDisplayName(productCode) {
+  const product = getProduct(productCode);
+  return product ? product.displayName : productCode;
+}
+
+function getAnchorsForSelection(productCode, barType) {
+  const group = getGroupConfig(productCode);
+  if (!group) return [];
+  const anchors =
+    barType === "threaded"
+      ? group.anchors.threaded || []
+      : barType === "rebar"
+      ? group.anchors.rebar || []
+      : [];
+  return anchors.filter((anchor) => anchor.active !== false);
+}
+
+function getCartridgesForProduct(productCode) {
+  const group = getGroupConfig(productCode);
+  if (!group) return [];
+  return group.cartridges || [];
+}
+
+function switchLanguage(lang) {
+  currentLanguage = lang;
+  document.querySelector('html').setAttribute('lang', lang);
+  
+  const btns = document.querySelectorAll('.lang-switcher .btn');
+  btns.forEach(btn => btn.classList.remove('active'));
+  if (lang === 'tr') btns[0].classList.add('active');
+  else btns[1].classList.add('active');
+  
+  const t = translations[lang];
+  
+  // Update all labels
+  document.getElementById('title1').textContent = t.title1;
+  document.getElementById('subtitle1').textContent = t.subtitle1;
+  document.getElementById('title2').textContent = t.title2;
+  document.getElementById('subtitle2').textContent = t.subtitle2;
+  document.getElementById('title3').textContent = t.title3;
+  document.getElementById('labelD0').textContent = t.labelD0;
+  document.getElementById('labelHef').textContent = t.labelHef;
+  document.getElementById('title4').textContent = t.title4;
+  document.getElementById('subtitle4').textContent = t.subtitle4;
+  document.getElementById('title5').textContent = t.title5;
+  document.getElementById('summaryTitle').textContent = t.summaryTitle;
+  document.getElementById('summaryLabel1').textContent = t.summaryLabel1;
+  document.getElementById('summaryLabel2').textContent = t.summaryLabel2;
+  document.getElementById('summaryLabel3').textContent = t.summaryLabel3;
+  document.getElementById('summaryLabel4').textContent = t.summaryLabel4;
+  document.getElementById('summaryLabel5').textContent = t.summaryLabel5;
+  document.getElementById('summaryLabel6').textContent = t.summaryLabel6;
+  document.getElementById('summaryLabel7').textContent = t.summaryLabel7;
+  document.getElementById('summaryLabel8').textContent = t.summaryLabel8;
+  document.getElementById('summaryLabel9').textContent = t.summaryLabel9;
+  document.getElementById('cartridgeTitle').textContent = t.cartridgeTitle;
+
+  const anchorContainer = document.getElementById('anchorContainer');
+  if(anchorContainer && anchorContainer.dataset.state){
+    renderContainerMessage(anchorContainer, anchorContainer.dataset.state);
+  }
+
+  const cartridgeContainer = document.getElementById('cartridgeRows');
+  if(cartridgeContainer && cartridgeContainer.dataset.state){
+    renderContainerMessage(cartridgeContainer, cartridgeContainer.dataset.state);
+  }
+  updateEfficiencyLabels();
+  updateEfficiencyActiveState();
+  if (cartridgeContainer && !cartridgeContainer.dataset.state) {
+    rebuildCartridgeRows();
+  }
+  updateReportLabels();
+  
+  // Re-update summary since labels changed
+  updateSummary();
+}
+
+window.addEventListener('DOMContentLoaded', async () => {
+  moveBubble(document.getElementById('rangeHoles'), document.getElementById('bubbleHoles'));
+  moveBubble(document.getElementById('rangeDepth'), document.getElementById('bubbleDepth'));
+
+  document.getElementById('selectProduct').addEventListener('change', updateUI);
+  document.querySelectorAll('input[name="barType"]').forEach(r => {
+    r.addEventListener('click', updateUI);
+  });
+  document.getElementById('dropdownD0').addEventListener('change', updateSummary);
+  const downloadBtn = document.getElementById('downloadPdfBtn');
+  if (downloadBtn) {
+    downloadBtn.addEventListener('click', downloadReport);
+  }
+
+  const defaultBar = document.querySelector('input[name="barType"][value="threaded"]');
+  if (defaultBar) defaultBar.checked = true;
+
+  await loadInitialConfig();
+});
+
+function updateUI(){
+  if(!calculatorConfig){
+    renderContainerMessage(document.getElementById('anchorContainer'), "loading");
+    renderContainerMessage(document.getElementById('cartridgeRows'), "loading");
+    return;
+  }
+  rebuildAnchorOptions();
+  rebuildCartridgeRows();
+  updateSummary();
+}
+
+function rebuildAnchorOptions(){
+  const product= document.getElementById('selectProduct').value;
+  const barTypeElem= document.querySelector('input[name="barType"]:checked');
+  const container= document.getElementById('anchorContainer');
+  if(!container){
+    return;
+  }
+  if(!calculatorConfig){
+    renderContainerMessage(container, "loading");
+    return;
+  }
+  const t = translations[currentLanguage];
+  if(!product||!barTypeElem){
+    renderContainerMessage(container, "needsSelection");
+    return;
+  }
+  const barType= barTypeElem.value;
+
+  const anchors= getAnchorsForSelection(product, barType);
+  if(!anchors.length){
+    renderContainerMessage(container, "invalidProduct");
+    return;
+  }
+
+  renderContainerMessage(container, null);
+  container.innerHTML="";
+  anchors.forEach((obj,idx)=>{
+    const label= document.createElement('label');
+    label.classList.add('btn','eta-toggle','mr-1');
+
+    const input= document.createElement('input');
+    input.type="radio";
+    input.name="anchorChoice";
+    input.value= obj.id;
+    input.dataset.d0= obj.d0;
+    if (obj.da != null) input.dataset.da = obj.da;
+    input.dataset.hef= obj.hef;
+    input.dataset.hmin= obj.hmin||0;
+    input.dataset.hmax= obj.hmax||0;
+    if(idx===0) input.checked= true;
+
+    const etaEnabled = isEtaAnchorApproved(product, barType, obj.id);
+    if (etaEnabled) {
+      label.classList.add('eta-approved');
+    } else {
+      label.classList.add('eta-disabled');
+    }
+
+    input.addEventListener('click', ()=>{
+      buildD0Dropdown(obj.d0);
+      document.getElementById('rangeDepth').value= obj.hef;
+      document.getElementById('textDepth').value= obj.hef;
+      moveBubble(document.getElementById('rangeDepth'),document.getElementById('bubbleDepth'));
+      document.getElementById('bubbleDepth').querySelector('.number').textContent= obj.hef;
+      updateSummary();
+    });
+
+    label.appendChild(input);
+    label.appendChild(document.createTextNode(obj.id));
+    container.appendChild(label);
+  });
+
+  if(anchors.length>0){
+    const firstRadio= container.querySelector('input[name="anchorChoice"]');
+    if(firstRadio) firstRadio.dispatchEvent(new Event('click'));
+  }
+}
+function buildD0Dropdown(recommendedD0){
+  const dropdown= document.getElementById('dropdownD0');
+  dropdown.innerHTML="";
+  const vals= [recommendedD0, recommendedD0+1, recommendedD0+2];
+  vals.forEach(v=>{
+    const opt= document.createElement('option');
+    opt.value= v;
+    opt.textContent= v+" mm";
+    dropdown.appendChild(opt);
+  });
+  dropdown.selectedIndex=0;
+}
+function rebuildCartridgeRows(){
+  const product= document.getElementById('selectProduct').value;
+  const container= document.getElementById('cartridgeRows');
+  if(!container){
+    return;
+  }
+  if(!calculatorConfig){
+    renderContainerMessage(container, "loading");
+    return;
+  }
+  if(!product){
+    renderContainerMessage(container, "needsProduct");
+    return;
+  }
+  const t = translations[currentLanguage];
+  const cartridges = getCartridgesForProduct(product);
+  if(!cartridges.length){
+    renderContainerMessage(container, "invalidProduct");
+    return;
+  }
+
+  renderContainerMessage(container, null);
+  cartridges.forEach(({ nominal })=>{
+    const rowDiv= document.createElement('div');
+    rowDiv.classList.add('cartridge-row');
+
+    const wrapper= document.createElement('div');
+    wrapper.classList.add('cartridge-img-wrapper');
+    const imgEl= document.createElement('img');
+    imgEl.src= "/api/assets/product-image?product="+product+"&nominal="+nominal;
+    imgEl.alt= product+"-"+nominal;
+    imgEl.width= 80;
+    imgEl.height= 160;
+    imgEl.loading= "lazy";
+    imgEl.onerror= () => {
+      imgEl.style.display= "none";
+    };
+    wrapper.appendChild(imgEl);
+
+    const textSpan= document.createElement('span');
+    textSpan.innerHTML=
+      nominal+" ml: <strong id='cart_"+nominal+"'>0</strong> "+
+      t.cartridgeCount+" • <strong id='holes_"+nominal+"'>0</strong> "+
+      t.holesPerCartridge;
+
+    rowDiv.appendChild(wrapper);
+    rowDiv.appendChild(textSpan);
+    container.appendChild(rowDiv);
+  });
+}
+
+function parseAnchorDiameter(anchorId) {
+  if (!anchorId || anchorId === "—") return 0;
+  const match = anchorId.match(/(\d+(\.\d+)?)/);
+  return match ? parseFloat(match[1]) : 0;
+}
+
+// Summary
+function updateSummary(){
+  if(!calculatorConfig) return;
+  const selectEl = document.getElementById('selectProduct');
+  const productCode = selectEl ? selectEl.value : "";
+  const product= productCode || "—";
+  const barTypeElem= document.querySelector('input[name="barType"]:checked');
+  const barType= barTypeElem? barTypeElem.value:"—";
+
+  const anchorElem= document.querySelector('input[name="anchorChoice"]:checked');
+  let anchorId="—", recommendedD0=8, recommendedHef=80, hmin=0,hmax=0;
+  if(anchorElem){
+    anchorId= anchorElem.value;
+    recommendedD0= parseFloat(anchorElem.dataset.d0)||8;
+    recommendedHef= parseFloat(anchorElem.dataset.hef)||80;
+    hmin= parseInt(anchorElem.dataset.hmin,10)||0;
+    hmax= parseInt(anchorElem.dataset.hmax,10)||0;
+  }
+  let anchorDiameter = parseAnchorDiameter(anchorId);
+  if (anchorElem) {
+    const daValue = parseFloat(anchorElem.dataset.da);
+    if (!Number.isNaN(daValue) && daValue > 0) {
+      anchorDiameter = daValue;
+    }
+  }
+
+  const d0= parseFloat(document.getElementById('dropdownD0').value)|| recommendedD0;
+  const depth= parseInt(document.getElementById('rangeDepth').value,10)|| recommendedHef;
+  const holes= parseInt(document.getElementById('rangeHoles').value,10)||0;
+
+  const t = translations[currentLanguage];
+  const selectedEfficiency = getSelectedEfficiency();
+  const efficiencyLabel = selectedEfficiency
+    ? getEfficiencyLabel(selectedEfficiency)
+    : t.efficiencyStandard;
+
+  // Convert the short code => displayed name
+  let displayedProduct= productCode ? getProductDisplayName(productCode) : "—";
+
+  document.getElementById('summaryProduct').textContent= displayedProduct;
+  document.getElementById('summaryBarType').textContent=
+    (barType==="threaded")?t.threaded:(barType==="rebar"?t.rebar:"—");
+  document.getElementById('summaryAnchor').textContent= anchorId;
+  document.getElementById('summaryD0').textContent= d0.toString();
+  document.getElementById('summaryDepth').textContent= depth.toString();
+  document.getElementById('summaryEfficiency').textContent= efficiencyLabel;
+
+  const reportBarType =
+    barType === "threaded" ? t.threaded : barType === "rebar" ? t.rebar : "—";
+  const reportProductEl = document.getElementById('reportProduct');
+  if (reportProductEl) reportProductEl.textContent = displayedProduct;
+  const reportBarEl = document.getElementById('reportBarType');
+  if (reportBarEl) reportBarEl.textContent = reportBarType;
+  const reportAnchorEl = document.getElementById('reportAnchor');
+  if (reportAnchorEl) reportAnchorEl.textContent = anchorId;
+  const reportD0El = document.getElementById('reportD0');
+  if (reportD0El) reportD0El.textContent = d0.toString();
+  const reportDepthEl = document.getElementById('reportDepth');
+  if (reportDepthEl) reportDepthEl.textContent = depth.toString();
+  const reportHolesEl = document.getElementById('reportHoles');
+  if (reportHolesEl) reportHolesEl.textContent = holes.toString();
+  const reportEffEl = document.getElementById('reportEfficiency');
+  if (reportEffEl) reportEffEl.textContent = efficiencyLabel;
+
+  // ETA checks => inline logos (only for products with ETA approval)
+  let diameterApproved=false, depthApproved=false;
+  
+  const etaDiameterLabel= document.getElementById('etaDiameterLabel');
+  const etaDepthLabel= document.getElementById('etaDepthLabel');
+  
+  // Check if current product has ETA approval
+  const hasEtaApproval =
+    productCode && anchorId !== "—" && (barType === "threaded" || barType === "rebar")
+      ? isEtaAnchorApproved(productCode, barType, anchorId)
+      : false;
+  
+  if(hasEtaApproval){
+    if(Math.abs(d0 - recommendedD0)<0.01){
+      etaDiameterLabel.innerHTML= `${t.etaApproved}
+        <img src="assets/etalogo.png" alt="ETA" class="eta-icon-inline">`;
+      etaDiameterLabel.className= "eta-label eta-approved";
+      diameterApproved= true;
+    } else {
+      etaDiameterLabel.innerHTML= t.etaExternal;
+      etaDiameterLabel.className= "eta-label eta-notapproved";
+    }
+
+    if(hmin>0 && hmax>0 && depth>=hmin && depth<=hmax){
+      etaDepthLabel.innerHTML= `${t.etaApproved}
+        <img src="assets/etalogo.png" alt="ETA" class="eta-icon-inline">`;
+      etaDepthLabel.className= "eta-label eta-approved";
+      depthApproved= true;
+    } else if(hmin>0 && hmax>0){
+      etaDepthLabel.innerHTML= t.etaExternal;
+      etaDepthLabel.className= "eta-label eta-notapproved";
+    } else {
+      etaDepthLabel.innerHTML= "";
+      etaDepthLabel.className= "eta-label";
+    }
+  } else {
+    // Product doesn't have ETA - hide all ETA text/logos
+    etaDiameterLabel.innerHTML= "";
+    etaDiameterLabel.className= "eta-label";
+    etaDepthLabel.innerHTML= "";
+    etaDepthLabel.className= "eta-label";
+  }
+
+  const areaFactor = formulaConstants?.circular_area_factor?.value ?? 0.25;
+  const mlConversion = formulaConstants?.ml_conversion?.value ?? 0.001;
+
+  const holeVolume= Math.PI*(d0**2)* depth*areaFactor*mlConversion;
+  const anchorVolume= Math.PI*(anchorDiameter**2)* depth*areaFactor*mlConversion;
+  const netVolume= Math.max(0, holeVolume - anchorVolume);
+  const isOptimized = selectedEfficiency?.code === "optimized";
+  let multiplier = 0;
+  if (barType === "rebar") {
+    const optimizedMultiplier = anchorDiameter <= 20 ? 1.333 : 1.3;
+    const standardMultiplier =
+      optimizedMultiplier * (anchorDiameter <= 18 ? 1.2 : 1.1);
+    multiplier = isOptimized ? optimizedMultiplier : standardMultiplier;
+  } else {
+    multiplier = isOptimized ? 2.4 : 2.88;
+  }
+  const perHole= netVolume * multiplier;
+  const totalVolume= holes * perHole;
+
+  document.getElementById('summaryEffMlOne').textContent= perHole.toFixed(1);
+  document.getElementById('summaryTotalVolume').textContent= totalVolume.toFixed(1);
+  document.getElementById('summaryHoles').textContent= holes;
+  document.getElementById('summaryEtaRange').textContent= `[${hmin},${hmax}]`;
+  const reportPerHoleEl = document.getElementById('reportEffMlOne');
+  if (reportPerHoleEl) reportPerHoleEl.textContent = perHole.toFixed(1);
+
+  // Cartridge => netVol (no usage-factor reduction)
+  const cartridges = productCode ? getCartridgesForProduct(productCode) : [];
+  const reportRows = [];
+  cartridges.forEach(({ nominal, net }) => {
+    const netVol = Number.isFinite(net) && net > 0 ? net : nominal;
+    const needed= perHole > 0 ? Math.ceil(totalVolume / netVol) : 0;
+    const holesPerCartridge= perHole > 0 ? Math.floor(netVol / perHole) : 0;
+    const cartEl= document.getElementById('cart_'+nominal);
+    if(cartEl) cartEl.textContent= needed;
+    const holesEl= document.getElementById('holes_'+nominal);
+    if(holesEl) holesEl.textContent= holesPerCartridge;
+    reportRows.push({ nominal, needed, holesPerCartridge });
+  });
+  const reportBody = document.getElementById('reportCartridgeRows');
+  if (reportBody) {
+    reportBody.innerHTML = reportRows.length
+      ? reportRows
+          .map(
+            (row) =>
+              `<tr><td>${row.nominal} ml</td><td>${row.needed}</td><td>${row.holesPerCartridge}</td></tr>`
+          )
+          .join("")
+      : "<tr><td colspan='3'>—</td></tr>";
+  }
+  updateReportTimestamp();
+}
+
+// Sliders bubble
+function moveBubble(rangeInput,bubbleElem){
+  const min= rangeInput.min;
+  const max= rangeInput.max;
+  const val= rangeInput.value;
+  const percent=((val-min)/(max-min))*100;
+  bubbleElem.style.left=`calc(${percent}% + (${8 - percent*0.15}px))`;
+}
+function updateDepthSlider(rangeInput){
+  const val= parseInt(rangeInput.value,10);
+  moveBubble(rangeInput, document.getElementById('bubbleDepth'));
+  document.getElementById('bubbleDepth').querySelector('.number').textContent= val;
+  document.getElementById('textDepth').value= val;
+  updateSummary();
+}
+function updateDepthNumber(numInput){
+  let val= parseInt(numInput.value,10)||60;
+  if(val<60) val=60;
+  if(val>1000) val=1000;
+  document.getElementById('rangeDepth').value= val;
+  moveBubble(document.getElementById('rangeDepth'), document.getElementById('bubbleDepth'));
+  document.getElementById('bubbleDepth').querySelector('.number').textContent= val;
+  updateSummary();
+}
+function updateHolesSlider(rangeInput){
+  const val= parseInt(rangeInput.value,10);
+  moveBubble(rangeInput, document.getElementById('bubbleHoles'));
+  document.getElementById('bubbleHoles').querySelector('.number').textContent= val;
+  document.getElementById('textHoles').value= val;
+  updateSummary();
+}
+function updateHolesNumber(numInput){
+  let val= parseInt(numInput.value,10)||0;
+  if(val<0) val=0;
+  if(val>5000) val=5000;
+  const rangeInput = document.getElementById('rangeHoles');
+  rangeInput.value= val;
+  moveBubble(rangeInput, document.getElementById('bubbleHoles'));
+  document.getElementById('bubbleHoles').querySelector('.number').textContent= val;
+  updateSummary();
+}
+</script>
+</body>
+</html>
