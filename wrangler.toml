@@ -1,1 +1,2 @@
 name = "metsan-icfs"
+pages_build_output_dir = "public"
